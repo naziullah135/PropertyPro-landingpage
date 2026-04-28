@@ -1,11 +1,9 @@
-import { HugeiconsIcon } from "@hugeicons/react";
-import type { IconSvgElement } from "@hugeicons/react";
+import Link from "next/link";
+import Image from "next/image";
 import {
   Building03FreeIcons,
   ContractsFreeIcons,
   HomeFreeIcons,
-  SearchFreeIcons,
-  Notification01FreeIcons,
   ArrowUpRight01FreeIcons,
   CheckmarkCircle02FreeIcons,
   StarFreeIcons,
@@ -17,11 +15,24 @@ import {
   File01FreeIcons,
   SmartPhone01FreeIcons,
 } from "@hugeicons/core-free-icons";
-import { Button } from "@/components/ui/button";
-import { Navbar } from "@/components/navbar";
 import { FAQ } from "@/components/faq";
+import { Navbar } from "@/components/navbar";
+import { Button } from "@/components/ui/button";
+import { HugeiconsIcon } from "@hugeicons/react";
+import type { IconSvgElement } from "@hugeicons/react";
 
-const partnerLogos = ["Skyline", "EstateOS", "Hometrust", "Realio"];
+const HERO_SCREENSHOT_URL =
+  process.env.NEXT_PUBLIC_HERO_SCREENSHOT_URL ??
+  "https://pub-87b115b8ffd84f39963e0f5bfaa9a50e.r2.dev/Screenshot/dashboard-2.0.png";
+
+const heroKeywords = [
+  "Property Management",
+  "Rental Management",
+  "Tenant Management",
+  "Rent Collection",
+  "Real Estate Software",
+  "Landlord Software",
+];
 
 const features: { title: string; description: string; icon: IconSvgElement }[] =
   [
@@ -159,36 +170,35 @@ export default function Home() {
       <Navbar />
       {/* Hero */}
       <section className="relative px-6 pt-6 pb-16 md:px-12 md:pt-8 md:pb-24">
-
         <div className="mx-auto w-full max-w-7xl">
           {/* Headline */}
-          <div className="relative z-10 mx-auto mt-6 max-w-4xl text-center md:mt-12">
+          <div className="relative z-10 mx-auto mt-6 max-w-7xl text-center md:mt-12">
             <h1 className="text-4xl font-bold leading-[1.05] tracking-tight text-balance text-slate-900 md:text-6xl">
-              Simplify Property Management
-              <br />
-              <span className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
-                Boost Portfolio Returns
+              <span className="bg-linear-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
+                Complete Property Management Software for Landlords & Real
+                Estate Businesses
               </span>
             </h1>
-            <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-slate-500 md:text-lg">
-              Easily manage your properties, tenants, leases, and payments from
-              a single production-ready system.
-            </p>
+            <div className="mx-auto mt-7 flex max-w-full flex-nowrap items-center justify-start gap-2.5 overflow-x-auto pb-1 md:justify-center md:overflow-visible">
+              {heroKeywords.map((keyword) => (
+                <p
+                  key={keyword}
+                  className="inline-flex h-10 shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-blue-100 bg-white/80 px-4 text-xs font-semibold text-slate-700 shadow-sm shadow-blue-900/5 backdrop-blur md:text-sm"
+                >
+                  {keyword}
+                </p>
+              ))}
+            </div>
 
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <Button
-                size="lg"
-                className="h-12 rounded-full bg-blue-600 px-6 text-white shadow-lg shadow-blue-500/30 hover:bg-blue-700"
+              <a
+                href="https://propertypro-live.neurolightstudio.com/dashboard"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-12 items-center justify-center rounded-full bg-blue-600 px-6 text-xl font-bold text-white shadow-lg shadow-blue-500/30 hover:bg-blue-700"
               >
                 Try Live Demo
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="h-12 rounded-full border-slate-200 bg-white px-6 text-slate-900 shadow-sm hover:bg-slate-50"
-              >
-                Book a Demo
-              </Button>
+              </a>
             </div>
           </div>
 
@@ -207,38 +217,19 @@ export default function Home() {
           </div>
 
           {/* Hero product mockup */}
-          <div className="relative z-10 mx-auto mt-6 max-w-5xl md:mt-10">
-            <div className="relative hidden md:block">
-              <PersonaPill
-                label="Tenant"
-                dotClass="bg-emerald-500"
-                position="absolute -left-4 top-24 z-20"
-              />
-              <PersonaPill
-                label="Investor"
-                dotClass="bg-violet-500"
-                position="absolute -right-4 top-24 z-20"
-              />
-            </div>
-            <DashboardMock />
-          </div>
-
-          {/* Logo strip */}
-          <div className="relative z-10 mx-auto mt-16 flex max-w-5xl flex-col items-center gap-6 md:mt-20 md:flex-row md:gap-10">
-            <p className="max-w-[180px] text-center text-sm leading-tight text-slate-500 md:text-left">
-              Trusted by leading
-              <br />
-              property businesses
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4">
-              {partnerLogos.map((logo) => (
-                <div
-                  key={logo}
-                  className="flex h-12 w-32 items-center justify-center rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold tracking-wide text-slate-400"
-                >
-                  {logo}
-                </div>
-              ))}
+          <div className="relative z-10 mx-auto mt-6 w-full px-6 md:mt-10 md:px-12">
+            <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl shadow-blue-900/10">
+              <Link href="https://propertypro-live.neurolightstudio.com/dashboard">
+                <Image
+                  src={HERO_SCREENSHOT_URL}
+                  alt="PropertyPro dashboard preview"
+                  width={1280}
+                  height={848}
+                  sizes="(max-width: 1280px) 100vw, 1280px"
+                  preload
+                  className="h-auto w-full"
+                />
+              </Link>
             </div>
           </div>
         </div>
@@ -419,19 +410,31 @@ export default function Home() {
             built for landlords, managers, and tenants.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Button
-              size="lg"
-              className="h-12 rounded-full bg-white px-6 text-blue-600 hover:bg-white/90"
+            <Link
+              href="https://propertypro-live.neurolightstudio.com/dashboard"
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              Try Live Demo
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="h-12 rounded-full border-white/40 bg-transparent px-6 text-white hover:bg-white/10"
+              <Button
+                size="lg"
+                className="h-12 cursor-pointer rounded-full bg-white px-6 text-lg font-bold text-blue-600 hover:bg-white/90"
+              >
+                Visit Live Demo
+              </Button>
+            </Link>
+            <Link
+              href="https://codecanyon.net/item/propertypro-property-tenant-management-software-nextjs-mongodb/60300696"
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              Book a Demo
-            </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="h-12 rounded-full cursor-pointer border-white/40 bg-transparent px-6 text-lg font-bold text-white hover:bg-white/10"
+              >
+                Purchase Now
+              </Button>
+            </Link>
           </div>
           <ul className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-white/80">
             {["35+ ready screens", "TypeScript first", "One-time license"].map(
@@ -471,141 +474,9 @@ function PersonaPill({
   );
 }
 
-function DashboardMock() {
-  return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl shadow-blue-900/10">
-      {/* Top bar */}
-      <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-3.5">
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2">
-            <div className="flex size-7 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-cyan-500">
-              <HugeiconsIcon
-                icon={HomeFreeIcons}
-                className="size-4 text-white"
-              />
-            </div>
-            <span className="text-sm font-bold text-slate-900">
-              PropertyPro
-            </span>
-          </div>
-          <div className="hidden items-center gap-5 text-xs font-medium text-slate-500 md:flex">
-            <span className="text-slate-900">Dashboard</span>
-            <span>Properties</span>
-            <span>Tenants</span>
-            <span>Leases</span>
-            <span>Payments</span>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="flex size-7 items-center justify-center rounded-md text-slate-400">
-            <HugeiconsIcon icon={SearchFreeIcons} className="size-4" />
-          </div>
-          <div className="flex size-7 items-center justify-center rounded-md text-slate-400">
-            <HugeiconsIcon icon={Notification01FreeIcons} className="size-4" />
-          </div>
-          <div className="size-7 rounded-full bg-gradient-to-br from-amber-400 to-rose-400" />
-        </div>
-      </div>
-
-      {/* Body */}
-      <div className="p-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <h3 className="text-base font-bold text-slate-900">
-              Property Portfolio
-            </h3>
-          </div>
-          <div className="flex items-center gap-3 text-xs">
-            <span className="font-semibold text-blue-600">Timeline</span>
-            <span className="text-slate-400">Calendar</span>
-            <span className="text-slate-400">Dashboard</span>
-            <span className="text-slate-400">Progress</span>
-          </div>
-        </div>
-
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="rounded-full border border-slate-200 px-3 py-1 text-xs font-medium text-slate-700">
-            Board View
-          </span>
-          <span className="rounded-full border border-slate-200 px-3 py-1 text-xs font-medium text-slate-400">
-            List View
-          </span>
-          <span className="rounded-full border border-slate-200 px-3 py-1 text-xs font-medium text-slate-400">
-            All Owners
-          </span>
-        </div>
-
-        {/* Kanban columns */}
-        <div className="mt-4 grid gap-3 md:grid-cols-4">
-          {[
-            {
-              status: "Vacant",
-              tag: "Listing",
-              tagBg: "bg-amber-100 text-amber-700",
-              title: "Maple Heights · Unit 4B",
-              copy: "Awaiting tenant application review and credit check.",
-            },
-            {
-              status: "Active Lease",
-              tag: "Occupied",
-              tagBg: "bg-blue-100 text-blue-700",
-              title: "Riverside Tower · #1207",
-              copy: "Lease running smoothly, on-time payments confirmed.",
-            },
-            {
-              status: "In Review",
-              tag: "Renewal",
-              tagBg: "bg-violet-100 text-violet-700",
-              title: "Oakwood Villa · 2nd Floor",
-              copy: "Renewal contract sent — pending tenant signature.",
-            },
-            {
-              status: "Maintenance",
-              tag: "Open Ticket",
-              tagBg: "bg-rose-100 text-rose-700",
-              title: "Pinegrove Lofts · A-12",
-              copy: "Plumbing inspection scheduled with vendor for Friday.",
-            },
-          ].map((col) => (
-            <div key={col.title} className="rounded-xl bg-slate-50 p-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-700">
-                  {col.status}
-                </span>
-                <span className="text-xs text-slate-400">···</span>
-              </div>
-              <div className="mt-3 rounded-lg bg-white p-3 shadow-sm">
-                <span
-                  className={`inline-block rounded-md px-2 py-0.5 text-[10px] font-semibold ${col.tagBg}`}
-                >
-                  {col.tag}
-                </span>
-                <p className="mt-2 text-sm font-semibold text-slate-900">
-                  {col.title}
-                </p>
-                <p className="mt-1 text-xs leading-snug text-slate-500">
-                  {col.copy}
-                </p>
-                <div className="mt-3 flex items-center justify-between text-[10px] text-slate-400">
-                  <div className="flex -space-x-1">
-                    <div className="size-4 rounded-full bg-blue-400 ring-2 ring-white" />
-                    <div className="size-4 rounded-full bg-emerald-400 ring-2 ring-white" />
-                    <div className="size-4 rounded-full bg-amber-400 ring-2 ring-white" />
-                  </div>
-                  <span>12 comments</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function OnboardingMock() {
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-100 via-sky-50 to-white p-5 shadow-xl shadow-blue-900/10">
+    <div className="relative overflow-hidden rounded-3xl bg-linear-to-br from-blue-100 via-sky-50 to-white p-5 shadow-xl shadow-blue-900/10">
       <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white">
         {/* App chrome */}
         <div className="flex items-center gap-1.5 border-b border-slate-100 px-4 py-2.5">

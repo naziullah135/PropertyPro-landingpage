@@ -1,13 +1,14 @@
 "use client";
 
-import { Accordion } from "@base-ui/react/accordion";
-import { HugeiconsIcon } from "@hugeicons/react";
+import Link from "next/link";
 import {
   Add01FreeIcons,
   Cancel01FreeIcons,
   ArrowRight01FreeIcons,
 } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Accordion } from "@base-ui/react/accordion";
 
 const faqs = [
   {
@@ -101,13 +102,20 @@ export function FAQ() {
 
         <div className="mt-10 flex flex-col items-center gap-3">
           <p className="text-sm text-slate-500">Still have questions?</p>
-          <Button
-            variant="outline"
-            className="h-11 rounded-full border-slate-200 bg-white px-5 text-sm font-medium text-slate-900 shadow-sm hover:bg-slate-50"
+
+          <Link
+            href="https://support.neurolightstudio.com/"
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            Contact support
-            <HugeiconsIcon icon={ArrowRight01FreeIcons} className="size-4" />
-          </Button>
+            <Button
+              variant="outline"
+              className="h-11 cursor-pointer text-center rounded-full border-slate-200 bg-white px-5 text-sm font-medium text-slate-900 shadow-sm hover:bg-slate-50"
+            >
+              Contact support
+              <HugeiconsIcon icon={ArrowRight01FreeIcons} className="size-4" />
+            </Button>
+          </Link>
         </div>
       </div>
     </section>

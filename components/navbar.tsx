@@ -16,17 +16,19 @@ import {
   FileEditFreeIcons,
   File01FreeIcons,
   CustomerSupportFreeIcons,
-  Message01FreeIcons,
   ShoppingCart01FreeIcons,
 } from "@hugeicons/core-free-icons";
-import type { IconSvgElement } from "@hugeicons/react";
-import { Button } from "@/components/ui/button";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import type { IconSvgElement } from "@hugeicons/react";
 
 type MenuItem = {
   title: string;
   description: string;
   icon: IconSvgElement;
+  href: string;
   badge?: string;
 };
 
@@ -44,21 +46,25 @@ const NAV: MenuConfig[] = [
         title: "PropertyPro Web",
         description: "Full-featured web dashboard for managers",
         icon: HomeFreeIcons,
+        href: "/user-manual#dashboard",
       },
       {
         title: "PropertyPro Mobile",
         description: "Native iOS & Android tenant apps",
         icon: SmartPhone01FreeIcons,
+        href: "/user-manual#mobile",
       },
       {
         title: "PropertyPro API",
         description: "Headless integrations for custom flows",
         icon: SourceCodeFreeIcons,
+        href: "/docs#overview",
       },
       {
         title: "Marketplace",
         description: "Listings & online rentals",
         icon: ShoppingCart01FreeIcons,
+        href: "/changelog",
         badge: "Coming Soon",
       },
     ],
@@ -71,31 +77,37 @@ const NAV: MenuConfig[] = [
         title: "Installation",
         description: "Professional setup & deployment",
         icon: Download04FreeIcons,
+        href: "/docs#quickstart",
       },
       {
         title: "Customization",
         description: "Tailored solutions for your needs",
         icon: Settings01FreeIcons,
+        href: "/docs#branding",
       },
       {
         title: "Web Development",
         description: "Custom websites & web apps",
         icon: SourceCodeFreeIcons,
+        href: "/docs#deploy-vercel",
       },
       {
         title: "UI/UX Service",
         description: "User-centered design & prototyping",
         icon: Layout01FreeIcons,
+        href: "/docs#branding",
       },
       {
         title: "Mobile App Development",
         description: "iOS & Android native and cross-platform",
         icon: SmartPhone01FreeIcons,
+        href: "/user-manual#mobile",
       },
       {
         title: "SaaS Development",
         description: "Scalable cloud-based products",
         icon: CloudFreeIcons,
+        href: "/docs#deploy-vps",
       },
     ],
   },
@@ -107,21 +119,25 @@ const NAV: MenuConfig[] = [
         title: "Documentation",
         description: "Guides, API references & tutorials",
         icon: Book02FreeIcons,
+        href: "/docs",
       },
       {
         title: "Changelog",
         description: "Latest updates & release notes",
         icon: FileEditFreeIcons,
+        href: "/changelog",
       },
       {
         title: "User Manual",
         description: "Step-by-step usage instructions",
         icon: File01FreeIcons,
+        href: "/user-manual",
       },
       {
         title: "Support",
         description: "Get help from our team",
         icon: CustomerSupportFreeIcons,
+        href: "https://support.neurolightstudio.com/",
       },
     ],
   },
@@ -160,23 +176,19 @@ export function Navbar() {
         "sticky top-0 z-50 w-full transition-all duration-200",
         scrolled
           ? "border-b border-slate-200/70 bg-white/80 backdrop-blur-md"
-          : "border-b border-transparent bg-transparent"
+          : "border-b border-transparent bg-transparent",
       )}
     >
       <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-6 md:px-12">
         {/* Logo */}
-        <a href="#" className="flex items-center gap-2.5">
-          <div className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 shadow-md shadow-blue-500/30">
-            <HugeiconsIcon
-              icon={HomeFreeIcons}
-              className="size-5 text-white"
-              strokeWidth={2.2}
-            />
-          </div>
-          <span className="text-lg font-bold tracking-tight text-slate-900">
-            PropertyPro
-          </span>
-        </a>
+        <Link href="/">
+          <Image
+            src="/logo-light.png"
+            alt="PropertyPro"
+            width={200}
+            height={100}
+          />
+        </Link>
 
         {/* Center nav */}
         <nav className="hidden md:block" onMouseLeave={scheduleClose}>
@@ -199,7 +211,7 @@ export function Navbar() {
                         "flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                         isOpen
                           ? "text-blue-600"
-                          : "text-slate-600 hover:text-slate-900"
+                          : "text-slate-600 hover:text-slate-900",
                       )}
                     >
                       {item.label}
@@ -207,7 +219,7 @@ export function Navbar() {
                         icon={ArrowDown01FreeIcons}
                         className={cn(
                           "size-3.5 transition-transform duration-200",
-                          isOpen ? "-rotate-180" : "rotate-0"
+                          isOpen ? "-rotate-180" : "rotate-0",
                         )}
                       />
                     </button>
@@ -231,22 +243,28 @@ export function Navbar() {
 
         {/* Right side */}
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            aria-label="Toggle theme"
-            className="flex size-10 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
+          <Link
+            href="https://codecanyon.net/item/propertypro-property-tenant-management-software-nextjs-mongodb/60300696"
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            <HugeiconsIcon icon={Moon02FreeIcons} className="size-4" />
-          </button>
-          <Button
-            variant="outline"
-            className="hidden h-10 rounded-full border-slate-200 bg-white px-5 text-sm font-medium text-slate-900 hover:bg-slate-50 sm:inline-flex"
+            <Button
+              variant="outline"
+              className="hidden h-10 rounded-full border-slate-200 bg-white px-5 text-sm font-medium text-slate-900 hover:bg-slate-50 sm:inline-flex"
+            >
+              Buy Now
+            </Button>
+          </Link>
+
+          <Link
+            href="https://propertypro-live.neurolightstudio.com/dashboard"
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            Buy Now
-          </Button>
-          <Button className="h-10 rounded-full bg-blue-600 px-5 text-sm font-medium text-white hover:bg-blue-700">
-            Live Preview
-          </Button>
+            <Button className="h-10 cursor-pointer text-center rounded-full bg-blue-600 px-5 text-sm font-medium text-white hover:bg-blue-700">
+              Live Preview
+            </Button>
+          </Link>
         </div>
       </div>
     </header>
@@ -258,19 +276,23 @@ function MegaMenu({ items, columns }: { items: MenuItem[]; columns: 1 | 2 }) {
     <div
       className={cn(
         "absolute top-full left-1/2 mt-2 -translate-x-1/2 rounded-2xl border border-slate-200/80 bg-white p-3 shadow-2xl shadow-blue-900/10",
-        columns === 2 ? "w-[640px]" : "w-[320px]"
+        columns === 2 ? "w-[640px]" : "w-[320px]",
       )}
     >
       <ul
         className={cn(
           "grid gap-1",
-          columns === 2 ? "grid-cols-2" : "grid-cols-1"
+          columns === 2 ? "grid-cols-2" : "grid-cols-1",
         )}
       >
         {items.map((item) => (
           <li key={item.title}>
             <a
-              href="#"
+              href={item.href}
+              target={item.href.startsWith("http") ? "_blank" : undefined}
+              rel={
+                item.href.startsWith("http") ? "noopener noreferrer" : undefined
+              }
               className="group flex items-start gap-3 rounded-xl p-3 transition-colors hover:bg-blue-50/60"
             >
               <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 transition-colors group-hover:bg-blue-100">
