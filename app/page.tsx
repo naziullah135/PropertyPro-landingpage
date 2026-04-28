@@ -25,15 +25,6 @@ const HERO_SCREENSHOT_URL =
   process.env.NEXT_PUBLIC_HERO_SCREENSHOT_URL ??
   "https://pub-87b115b8ffd84f39963e0f5bfaa9a50e.r2.dev/Screenshot/dashboard-2.0.png";
 
-const heroKeywords = [
-  "Property Management",
-  "Rental Management",
-  "Tenant Management",
-  "Rent Collection",
-  "Real Estate Software",
-  "Landlord Software",
-];
-
 const features: { title: string; description: string; icon: IconSvgElement }[] =
   [
     {
@@ -173,23 +164,15 @@ export default function Home() {
         <div className="mx-auto w-full max-w-7xl">
           {/* Headline */}
           <div className="relative z-10 mx-auto mt-6 max-w-7xl text-center md:mt-12">
-            <h1 className="text-4xl font-bold leading-[1.05] tracking-tight text-balance text-slate-900 md:text-6xl">
+            <h1 className="text-balance text-4xl font-bold leading-[1.05] tracking-tight text-slate-900 md:text-6xl">
               <span className="bg-linear-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
-                Complete Property Management Software for Landlords & Real
-                Estate Businesses
+                Property Management Software
+              </span>
+              <span className="mt-5  block text-lg font-semibold leading-tight text-black md:text-3xl">
+                Manage <span className="text-cyan-700">tenants, rent, leases, and maintenance</span> from one
+                dashboard.
               </span>
             </h1>
-            <div className="mx-auto mt-7 flex max-w-full flex-nowrap items-center justify-start gap-2.5 overflow-x-auto pb-1 md:justify-center md:overflow-visible">
-              {heroKeywords.map((keyword) => (
-                <p
-                  key={keyword}
-                  className="inline-flex h-10 shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-blue-100 bg-white/80 px-4 text-xs font-semibold text-slate-700 shadow-sm shadow-blue-900/5 backdrop-blur md:text-sm"
-                >
-                  {keyword}
-                </p>
-              ))}
-            </div>
-
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <a
                 href="https://propertypro-live.neurolightstudio.com/dashboard"
