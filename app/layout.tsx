@@ -1,5 +1,6 @@
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { siteConfig } from "@/lib/seo";
 import type { Metadata } from "next";
 import PlausibleProvider from "next-plausible";
 import type { ScriptHTMLAttributes } from "react";
@@ -23,9 +24,34 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PropertyPro - Property Management Software",
-  description:
-    "Manage your property business with PropertyPro - the all-in-one solution for property management",
+  metadataBase: new URL(siteConfig.url),
+  applicationName: siteConfig.name,
+  title: {
+    default: "PropertyPro - Property Management Software",
+    template: `%s | ${siteConfig.name}`,
+  },
+  description: siteConfig.description,
+  keywords: siteConfig.keywords,
+  authors: [{ name: siteConfig.creator }],
+  creator: siteConfig.creator,
+  publisher: siteConfig.creator,
+  category: "Property management software",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  formatDetection: {
+    telephone: false,
+    address: false,
+    email: false,
+  },
 };
 
 export default function RootLayout({

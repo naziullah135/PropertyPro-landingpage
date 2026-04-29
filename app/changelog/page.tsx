@@ -6,11 +6,16 @@ import {
 } from "@hugeicons/core-free-icons";
 import { Navbar } from "@/components/navbar";
 import { Button } from "@/components/ui/button";
+import { JsonLd } from "@/components/seo/json-ld";
+import { createBreadcrumbSchema, createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Changelog · PropertyPro",
-  description: "New updates and improvements to PropertyPro.",
-};
+export const metadata: Metadata = createPageMetadata({
+  title: "Changelog",
+  description:
+    "Track PropertyPro release notes, new property management features, platform improvements, and maintenance fixes.",
+  path: "/changelog",
+  keywords: ["PropertyPro updates", "property software changelog"],
+});
 
 type Section = "features" | "improvements" | "fixes";
 
@@ -184,6 +189,7 @@ const levelBadge: Record<Release["level"], string> = {
 export default function ChangelogPage() {
   return (
     <main className="min-h-screen bg-slate-50 font-sans">
+      <JsonLd data={createBreadcrumbSchema("Changelog", "/changelog")} />
       <Navbar />
 
       <section className="px-6 pt-12 pb-20 md:px-12 md:pt-20 md:pb-28">

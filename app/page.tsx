@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import type { Metadata } from "next";
 import {
   Building03FreeIcons,
   ContractsFreeIcons,
@@ -18,12 +19,46 @@ import {
 import { FAQ } from "@/components/faq";
 import { Navbar } from "@/components/navbar";
 import { Button } from "@/components/ui/button";
+import { JsonLd } from "@/components/seo/json-ld";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { IconSvgElement } from "@hugeicons/react";
+import { createHomePageSchema, createPageMetadata } from "@/lib/seo";
 
 const HERO_SCREENSHOT_URL =
   process.env.NEXT_PUBLIC_HERO_SCREENSHOT_URL ??
   "https://pub-87b115b8ffd84f39963e0f5bfaa9a50e.r2.dev/Screenshot/dashboard-2.0.png";
+
+export const metadata: Metadata = createPageMetadata({
+  title:
+    "PropertyPro - Property Management Software for Landlords, Rentals & Agencies",
+  description:
+    "PropertyPro is an all-in-one property management software for landlords, property managers, and real estate agencies. Manage tenants, rent collection, leases, maintenance requests, invoices, documents, reports, and rental properties from one modern dashboard.",
+  path: "/",
+  keywords: [
+    "property management software",
+    "rental property management software",
+    "landlord software",
+    "property manager software",
+    "real estate management software",
+    "tenant management software",
+    "rent collection software",
+    "lease management software",
+    "rental management software",
+    "apartment management software",
+    "property management system",
+    "property management dashboard",
+    "maintenance request software",
+    "rental property software",
+    "real estate agency software",
+    "property management SaaS",
+    "property management web app",
+    "landlord management software",
+    "tenant portal software",
+    "PropertyPro",
+  ],
+  imageAlt:
+    "PropertyPro property management software dashboard for landlords and agencies",
+});
 
 const features: { title: string; description: string; icon: IconSvgElement }[] =
   [
@@ -150,6 +185,7 @@ const testimonials = [
 export default function Home() {
   return (
     <main className="relative min-h-screen bg-white font-sans">
+      <JsonLd data={createHomePageSchema()} />
       {/* Sky/cloud backdrop — sits behind navbar + hero for a seamless top */}
       <div
         aria-hidden
@@ -169,8 +205,13 @@ export default function Home() {
                 Property Management Software
               </span>
               <span className="mt-5  block text-lg font-semibold leading-tight text-black md:text-3xl">
-                Manage <span className="text-cyan-700">tenants<span className="text-black">, </span>rent<span className="text-black">, </span>leases<span className="text-black">, and </span>maintenance</span> from one
-                dashboard.
+                Manage{" "}
+                <span className="text-cyan-700">
+                  tenants<span className="text-black">, </span>rent
+                  <span className="text-black">, </span>leases
+                  <span className="text-black">, and </span>maintenance
+                </span>{" "}
+                from one dashboard.
               </span>
             </h1>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
