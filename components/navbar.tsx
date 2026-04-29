@@ -5,6 +5,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   HomeFreeIcons,
   ArrowDown01FreeIcons,
+  ArrowUpRight01FreeIcons,
   Moon02FreeIcons,
   Download04FreeIcons,
   Settings01FreeIcons,
@@ -17,6 +18,7 @@ import {
   File01FreeIcons,
   CustomerSupportFreeIcons,
   ShoppingCart01FreeIcons,
+  Chat01FreeIcons,
 } from "@hugeicons/core-free-icons";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
@@ -30,42 +32,46 @@ type MenuItem = {
   icon: IconSvgElement;
   href: string;
   badge?: string;
+  externalIndicator?: boolean;
+  disabled?: boolean;
 };
 
 type MenuConfig =
   | { label: string; href: string }
-  | { label: string; items: MenuItem[]; columns?: 1 | 2 };
+  | {
+      label: string;
+      items: MenuItem[];
+      columns?: 1 | 2;
+      variant?: "default" | "products";
+    };
 
 const NAV: MenuConfig[] = [
-  { label: "Features", href: "#features" },
+  { label: "Features", href: "/#features" },
   {
     label: "Products",
     columns: 2,
+    variant: "products",
     items: [
       {
-        title: "PropertyPro Web",
-        description: "Full-featured web dashboard for managers",
+        title: "PropertyPro",
+        description: "Real estate management platform",
         icon: HomeFreeIcons,
-        href: "/user-manual#dashboard",
+        href: "https://codecanyon.net/item/propertypro-property-tenant-management-software-nextjs-mongodb/60300696",
+        externalIndicator: true,
       },
       {
-        title: "PropertyPro Mobile",
-        description: "Native iOS & Android tenant apps",
-        icon: SmartPhone01FreeIcons,
-        href: "/user-manual#mobile",
+        title: "Solvio",
+        description: "Realtime customer support & ticketing",
+        icon: Chat01FreeIcons,
+        href: "https://codecanyon.net/item/solvio-realtime-customer-support-ticketing-system-with-knowledge-base-email-notifications-mu/61429020",
       },
       {
-        title: "PropertyPro API",
-        description: "Headless integrations for custom flows",
-        icon: SourceCodeFreeIcons,
-        href: "/docs#overview",
-      },
-      {
-        title: "Marketplace",
-        description: "Listings & online rentals",
+        title: "Ecommerce",
+        description: "Full-featured online store solution",
         icon: ShoppingCart01FreeIcons,
-        href: "/changelog",
+        href: "#",
         badge: "Coming Soon",
+        disabled: true,
       },
     ],
   },
@@ -77,37 +83,37 @@ const NAV: MenuConfig[] = [
         title: "Installation",
         description: "Professional setup & deployment",
         icon: Download04FreeIcons,
-        href: "/docs#quickstart",
+        href: "https://support.neurolightstudio.com/dashboard/installation/new",
       },
       {
         title: "Customization",
         description: "Tailored solutions for your needs",
         icon: Settings01FreeIcons,
-        href: "/docs#branding",
+        href: "https://support.neurolightstudio.com/dashboard/customization/new",
       },
       {
         title: "Web Development",
         description: "Custom websites & web apps",
         icon: SourceCodeFreeIcons,
-        href: "/docs#deploy-vercel",
+        href: "https://support.neurolightstudio.com/dashboard/customization/new",
       },
       {
         title: "UI/UX Service",
         description: "User-centered design & prototyping",
         icon: Layout01FreeIcons,
-        href: "/docs#branding",
+        href: "https://support.neurolightstudio.com/dashboard/customization/new",
       },
       {
         title: "Mobile App Development",
         description: "iOS & Android native and cross-platform",
         icon: SmartPhone01FreeIcons,
-        href: "/user-manual#mobile",
+        href: "https://support.neurolightstudio.com/dashboard/customization/new",
       },
       {
         title: "SaaS Development",
         description: "Scalable cloud-based products",
         icon: CloudFreeIcons,
-        href: "/docs#deploy-vps",
+        href: "https://support.neurolightstudio.com/dashboard/customization/new",
       },
     ],
   },
@@ -141,7 +147,7 @@ const NAV: MenuConfig[] = [
       },
     ],
   },
-  { label: "FAQ", href: "#faq" },
+  { label: "FAQ", href: "/#faq" },
 ];
 
 export function Navbar() {
@@ -233,7 +239,11 @@ export function Navbar() {
                   )}
 
                   {isDropdown && isOpen && (
-                    <MegaMenu items={item.items} columns={item.columns ?? 2} />
+                    <MegaMenu
+                      items={item.items}
+                      columns={item.columns ?? 2}
+                      variant={item.variant ?? "default"}
+                    />
                   )}
                 </li>
               );
@@ -271,17 +281,31 @@ export function Navbar() {
   );
 }
 
-function MegaMenu({ items, columns }: { items: MenuItem[]; columns: 1 | 2 }) {
+function MegaMenu({
+  items,
+  columns,
+  variant,
+}: {
+  items: MenuItem[];
+  columns: 1 | 2;
+  variant: "default" | "products";
+}) {
+  const isProducts = variant === "products";
+
   return (
     <div
       className={cn(
-        "absolute top-full left-1/2 mt-2 -translate-x-1/2 rounded-2xl border border-slate-200/80 bg-white p-3 shadow-2xl shadow-blue-900/10",
-        columns === 2 ? "w-[640px]" : "w-[320px]",
+        "absolute top-full left-1/2 mt-2 -translate-x-1/2 border bg-white shadow-2xl shadow-blue-900/10",
+        isProducts
+          ? "rounded-xl border-slate-200/70 p-5"
+          : "rounded-2xl border-slate-200/80 p-3",
+        columns === 2 ? (isProducts ? "w-[558px]" : "w-[640px]") : "w-[320px]",
       )}
     >
       <ul
         className={cn(
-          "grid gap-1",
+          "grid",
+          isProducts ? "gap-x-6 gap-y-4" : "gap-1",
           columns === 2 ? "grid-cols-2" : "grid-cols-1",
         )}
       >
@@ -289,27 +313,66 @@ function MegaMenu({ items, columns }: { items: MenuItem[]; columns: 1 | 2 }) {
           <li key={item.title}>
             <a
               href={item.href}
-              target={item.href.startsWith("http") ? "_blank" : undefined}
-              rel={
-                item.href.startsWith("http") ? "noopener noreferrer" : undefined
+              target={
+                item.href.startsWith("http") && !item.disabled
+                  ? "_blank"
+                  : undefined
               }
-              className="group flex items-start gap-3 rounded-xl p-3 transition-colors hover:bg-blue-50/60"
+              rel={
+                item.href.startsWith("http") && !item.disabled
+                  ? "noopener noreferrer"
+                  : undefined
+              }
+              aria-disabled={item.disabled}
+              onClick={(event) => {
+                if (item.disabled) event.preventDefault();
+              }}
+              className={cn(
+                "group flex items-start gap-3 rounded-xl transition-colors",
+                isProducts ? "p-0" : "p-3",
+                item.disabled
+                  ? "cursor-default opacity-55"
+                  : isProducts
+                    ? "hover:text-blue-600"
+                    : "hover:bg-blue-50/60",
+              )}
             >
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 transition-colors group-hover:bg-blue-100">
-                <HugeiconsIcon icon={item.icon} className="size-4" />
+              <span
+                className={cn(
+                  "flex shrink-0 items-center justify-center bg-blue-50 text-blue-600 transition-colors group-hover:bg-blue-100",
+                  isProducts ? "size-10 rounded-2xl" : "size-9 rounded-lg",
+                )}
+              >
+                <HugeiconsIcon
+                  icon={item.icon}
+                  className={isProducts ? "size-5" : "size-4"}
+                />
               </span>
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <p className="text-sm font-semibold text-slate-900">
                     {item.title}
                   </p>
+                  {item.externalIndicator && (
+                    <HugeiconsIcon
+                      icon={ArrowUpRight01FreeIcons}
+                      className="size-3 text-slate-400"
+                    />
+                  )}
                   {item.badge && (
-                    <span className="rounded-md bg-blue-100 px-1.5 py-0.5 text-[10px] font-semibold text-blue-700">
+                    <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold text-blue-500">
                       {item.badge}
                     </span>
                   )}
                 </div>
-                <p className="mt-0.5 text-xs leading-snug text-slate-500">
+                <p
+                  className={cn(
+                    "text-xs leading-snug",
+                    isProducts
+                      ? "mt-1 max-w-42 text-slate-500"
+                      : "mt-0.5 text-slate-500",
+                  )}
+                >
                   {item.description}
                 </p>
               </div>

@@ -169,7 +169,7 @@ export default function Home() {
                 Property Management Software
               </span>
               <span className="mt-5  block text-lg font-semibold leading-tight text-black md:text-3xl">
-                Manage <span className="text-cyan-700">tenants, rent, leases, and maintenance</span> from one
+                Manage <span className="text-cyan-700">tenants<span className="text-black">, </span>rent<span className="text-black">, </span>leases<span className="text-black">, and </span>maintenance</span> from one
                 dashboard.
               </span>
             </h1>
@@ -201,7 +201,7 @@ export default function Home() {
 
           {/* Hero product mockup */}
           <div className="relative z-10 mx-auto mt-6 w-full px-6 md:mt-10 md:px-12">
-            <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl shadow-blue-900/10">
+            <div className="overflow-hidden rounded-4xl border border-slate-200/80 bg-white shadow-2xl shadow-blue-900/10">
               <Link href="https://propertypro-live.neurolightstudio.com/dashboard">
                 <Image
                   src={HERO_SCREENSHOT_URL}
