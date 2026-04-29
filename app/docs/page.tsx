@@ -273,7 +273,7 @@ const sections: Section[] = [
 MONGODB_URI=mongodb+srv://username:password@cluster0.kbnje.mongodb.net/propertypro
 
 # Self-Hosted MongoDB
-# MONGODB_URI=mongodb://mongo:password@your_ip_address:27017/propertypro?authSource=admin
+# MONGODB_URI=mongodb://mongo:password@your_ip_address:27017/propertypro
 # MONGODB_DB=propertypro
 
 # NextAuth Configuration
