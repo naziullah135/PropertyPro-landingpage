@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { IconSvgElement } from "@hugeicons/react";
 import {
@@ -661,7 +662,7 @@ export default function UserManualPage() {
               <span className="font-medium text-slate-900">New:</span> Live
               support tickets are now built into PropertyPro.
             </span>
-            <a
+            <Link
               href="#communications"
               className="inline-flex items-center gap-1 font-medium text-blue-600 hover:text-blue-700"
             >
@@ -670,7 +671,7 @@ export default function UserManualPage() {
                 icon={ArrowUpRight01FreeIcons}
                 className="size-3"
               />
-            </a>
+            </Link>
           </div>
           <button
             type="button"
@@ -731,7 +732,7 @@ export default function UserManualPage() {
           {/* Tabs */}
           <nav className="mt-4 -mb-px flex flex-wrap items-center gap-1 overflow-x-auto">
             {tabs.map((t) => (
-              <a
+              <Link
                 key={t.label}
                 href={t.href}
                 className={cn(
@@ -745,7 +746,7 @@ export default function UserManualPage() {
                 {t.active && (
                   <span className="absolute right-3 -bottom-px left-3 h-0.5 rounded-full bg-blue-600" />
                 )}
-              </a>
+              </Link>
             ))}
           </nav>
         </div>
@@ -807,7 +808,7 @@ export default function UserManualPage() {
 
             {/* Powered by */}
             <div className="border-t border-slate-200 px-5 py-4">
-              <a
+              <Link
                 href="/"
                 className="flex items-center gap-2.5 rounded-lg p-2 text-sm transition-colors hover:bg-slate-50"
               >
@@ -820,7 +821,7 @@ export default function UserManualPage() {
                     PropertyPro
                   </span>
                 </span>
-              </a>
+              </Link>
             </div>
           </div>
         </aside>
@@ -1076,13 +1077,13 @@ export default function UserManualPage() {
           {/* Footer */}
           <div className="mt-24 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 pt-6 text-xs text-slate-500">
             <div className="flex items-center gap-3">
-              <a
+              <Link
                 href="/changelog"
                 className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 transition-colors hover:bg-slate-50 hover:text-slate-900"
               >
                 <HugeiconsIcon icon={PencilEdit02FreeIcons} className="size-3.5" />
                 Changelog
-              </a>
+              </Link>
               <span className="text-slate-300">·</span>
               <span>Last updated April 28, 2026</span>
             </div>

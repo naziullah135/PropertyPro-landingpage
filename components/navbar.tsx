@@ -6,7 +6,6 @@ import {
   HomeFreeIcons,
   ArrowDown01FreeIcons,
   ArrowUpRight01FreeIcons,
-  Moon02FreeIcons,
   Download04FreeIcons,
   Settings01FreeIcons,
   SourceCodeFreeIcons,
@@ -230,12 +229,12 @@ export function Navbar() {
                       />
                     </button>
                   ) : (
-                    <a
+                    <Link
                       href={item.href}
                       className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:text-slate-900"
                     >
                       {item.label}
-                    </a>
+                    </Link>
                   )}
 
                   {isDropdown && isOpen && (
@@ -309,34 +308,19 @@ function MegaMenu({
           columns === 2 ? "grid-cols-2" : "grid-cols-1",
         )}
       >
-        {items.map((item) => (
-          <li key={item.title}>
-            <a
-              href={item.href}
-              target={
-                item.href.startsWith("http") && !item.disabled
-                  ? "_blank"
-                  : undefined
-              }
-              rel={
-                item.href.startsWith("http") && !item.disabled
-                  ? "noopener noreferrer"
-                  : undefined
-              }
-              aria-disabled={item.disabled}
-              onClick={(event) => {
-                if (item.disabled) event.preventDefault();
-              }}
-              className={cn(
-                "group flex items-start gap-3 rounded-xl transition-colors",
-                isProducts ? "p-0" : "p-3",
-                item.disabled
-                  ? "cursor-default opacity-55"
-                  : isProducts
-                    ? "hover:text-blue-600"
-                    : "hover:bg-blue-50/60",
-              )}
-            >
+        {items.map((item) => {
+          const isExternal = item.href.startsWith("http");
+          const linkClassName = cn(
+            "group flex items-start gap-3 rounded-xl transition-colors",
+            isProducts ? "p-0" : "p-3",
+            item.disabled
+              ? "cursor-default opacity-55"
+              : isProducts
+                ? "hover:text-blue-600"
+                : "hover:bg-blue-50/60",
+          );
+          const content = (
+            <>
               <span
                 className={cn(
                   "flex shrink-0 items-center justify-center bg-blue-50 text-blue-600 transition-colors group-hover:bg-blue-100",
@@ -376,9 +360,36 @@ function MegaMenu({
                   {item.description}
                 </p>
               </div>
-            </a>
-          </li>
-        ))}
+            </>
+          );
+
+          return (
+            <li key={item.title}>
+              {isExternal || item.disabled ? (
+                <a
+                  href={item.href}
+                  target={isExternal && !item.disabled ? "_blank" : undefined}
+                  rel={
+                    isExternal && !item.disabled
+                      ? "noopener noreferrer"
+                      : undefined
+                  }
+                  aria-disabled={item.disabled}
+                  onClick={(event) => {
+                    if (item.disabled) event.preventDefault();
+                  }}
+                  className={linkClassName}
+                >
+                  {content}
+                </a>
+              ) : (
+                <Link href={item.href} className={linkClassName}>
+                  {content}
+                </Link>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

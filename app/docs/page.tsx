@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { IconSvgElement } from "@hugeicons/react";
 import {
@@ -96,7 +97,7 @@ const sections: Section[] = [
     label: "Overview",
     title: "Welcome to PropertyPro",
     intro:
-      "PropertyPro is a complete property management application built with Next.js 16, React 19, and PostgreSQL. This documentation covers everything from your first install to deploying in production.",
+      "PropertyPro is a complete property management application built with Next.js 16, React 19, and MongoDB. This documentation covers everything from your first install to deploying in production.",
     icon: RocketFreeIcons,
     accent: "blue",
     bullets: [
@@ -113,7 +114,7 @@ const sections: Section[] = [
       {
         icon: SparklesFreeIcons,
         title: "Stack",
-        body: "Next.js 16, React 19 + Compiler, TypeScript, Tailwind CSS v4, PostgreSQL, Stripe.",
+        body: "Next.js 16, React 19 + Compiler, TypeScript, Tailwind CSS v4, MongoDB, Stripe.",
       },
       {
         icon: CustomerSupportFreeIcons,
@@ -134,7 +135,7 @@ const sections: Section[] = [
     label: "Quickstart",
     title: "Get running in 5 minutes",
     intro:
-      "If you're already comfortable with Node, pnpm, and Postgres, this is the express path. Each step is expanded later in the docs.",
+      "If you're already comfortable with Node, pnpm, and MongoDB, this is the express path. Each step is expanded later in the docs.",
     icon: PlayCircleFreeIcons,
     accent: "violet",
     steps: [
@@ -155,11 +156,11 @@ const sections: Section[] = [
         },
       },
       {
-        title: "Run migrations & seed",
-        body: "Create the schema and load demo data so you can log in immediately.",
+        title: "Connect MongoDB & seed",
+        body: "Set MONGODB_URI, then load demo data so you can log in immediately.",
         code: {
           lang: "bash",
-          body: "pnpm db:migrate\npnpm db:seed",
+          body: "pnpm db:seed",
         },
       },
       {
@@ -193,20 +194,20 @@ const sections: Section[] = [
       },
       {
         icon: Database02FreeIcons,
-        title: "PostgreSQL 14+",
-        body: "Local Postgres, Supabase, Neon, or any managed Postgres provider works.",
+        title: "MongoDB 6+",
+        body: "MongoDB Atlas is recommended. Self-hosted MongoDB works when MONGODB_URI points to your server.",
       },
       {
         icon: CloudUploadFreeIcons,
-        title: "Object storage (optional)",
-        body: "S3, Cloudflare R2, or local disk for property photos and tenant documents.",
+        title: "Object storage",
+        body: "Cloudflare R2 stores property photos, tenant documents, and uploaded files.",
       },
     ],
     callouts: [
       {
         tone: "note",
         title: "Hosting suggestion",
-        body: "For most buyers, Vercel + Supabase is the fastest path. The full deploy guide covers VPS and Docker too.",
+        body: "For most buyers, Vercel + MongoDB Atlas is the fastest path. The full deploy guide covers VPS and Docker too.",
       },
     ],
   },
@@ -261,56 +262,86 @@ const sections: Section[] = [
     label: "Environment Variables",
     title: "Configure .env.local",
     intro:
-      "All secrets live in .env.local. The included .env.example documents every key. Below is the minimum required set.",
+      "All secrets live in .env.local. The included .env.example documents every key. Below is a complete MongoDB-ready example.",
     icon: CodeFreeIcons,
     accent: "sky",
     codes: [
       {
         lang: "bash",
         title: ".env.local",
-        body: `# Core
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-DATABASE_URL=postgresql://user:pass@localhost:5432/propertypro
-AUTH_SECRET=run \\\`openssl rand -base64 32\\\`
+        body: `# Database Configuration (MongoDB Atlas)
+MONGODB_URI=mongodb+srv://username:password@cluster0.kbnje.mongodb.net/propertypro
+
+# Self-Hosted MongoDB
+# MONGODB_URI=mongodb://mongo:password@your_ip_address:27017/propertypro?authSource=admin
+# MONGODB_DB=propertypro
+
+# NextAuth Configuration
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your-nextauth-secret
+AUTH_TRUST_HOST=true
+AUTH_URL=http://localhost:3000
+
+# Cloudflare R2
+R2_ACCOUNT_ID=your-r2-account-id
+R2_ACCESS_KEY_ID=your-r2-access-key-id
+R2_SECRET_ACCESS_KEY=your-r2-secret-access-key
+R2_BUCKET_NAME=your-r2-bucket-name
+R2_PUBLIC_URL=https://your-custom-domain.com
+NEXT_PUBLIC_R2_PUBLIC_URL=https://your-custom-domain.com
 
 # Stripe
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
 
 # Email (SMTP)
-SMTP_HOST=smtp.resend.com
-SMTP_PORT=587
-SMTP_USER=resend
-SMTP_PASSWORD=re_...
-SMTP_FROM="PropertyPro <noreply@yourdomain.com>"
+EMAIL_SERVER_HOST=smtp.gmail.com
+EMAIL_SERVER_PORT=587
+EMAIL_SERVER_USER=your-email@gmail.com
+EMAIL_SERVER_PASSWORD=your-email-password
+EMAIL_FROM=your-email@gmail.com
 
-# Push notifications (VAPID)
-NEXT_PUBLIC_VAPID_PUBLIC_KEY=B...
+# File Upload Configuration
+UPLOAD_MAX_SIZE=10485760
+UPLOAD_ALLOWED_TYPES=image/jpeg,image/png,image/webp,application/pdf
+
+# Application Configuration (optional)
+APP_NAME=propertypro
+APP_URL=http://localhost:3000
+SUPPORT_EMAIL=support@propertypro.com
+
+# Web Push (VAPID)
+NEXT_PUBLIC_VAPID_PUBLIC_KEY=your-vapid-public-key
 VAPID_PRIVATE_KEY=...
-
-# Storage (optional)
-S3_ENDPOINT=https://s3.amazonaws.com
-S3_BUCKET=propertypro
-S3_ACCESS_KEY=...
-S3_SECRET_KEY=...`,
+VAPID_SUBJECT=mailto:admin@propertypro.app`,
       },
     ],
     envTable: [
       {
-        key: "DATABASE_URL",
+        key: "MONGODB_URI",
         required: true,
-        description: "PostgreSQL connection string. Include ?sslmode=require for hosted DBs.",
+        description: "MongoDB Atlas or self-hosted MongoDB connection string for the PropertyPro database.",
       },
       {
-        key: "AUTH_SECRET",
-        required: true,
-        description: "Random 32-byte secret used to sign session tokens. Never commit this.",
+        key: "MONGODB_DB",
+        required: false,
+        description: "Database name override. Useful when your connection string does not include /propertypro.",
       },
       {
-        key: "NEXT_PUBLIC_APP_URL",
+        key: "NEXTAUTH_SECRET",
         required: true,
-        description: "Public URL of your deployment, used in emails and OAuth redirects.",
+        description: "Random secret used to sign auth sessions. Never commit this.",
+      },
+      {
+        key: "NEXTAUTH_URL / AUTH_URL",
+        required: true,
+        description: "Public URL of your deployment, used in emails, callbacks, and auth redirects.",
+      },
+      {
+        key: "R2_*",
+        required: true,
+        description: "Cloudflare R2 credentials and public URL for uploaded property files.",
       },
       {
         key: "STRIPE_SECRET_KEY",
@@ -323,25 +354,25 @@ S3_SECRET_KEY=...`,
         description: "Signing secret for the /api/webhooks/stripe endpoint.",
       },
       {
-        key: "SMTP_*",
+        key: "EMAIL_SERVER_*",
         required: true,
         description: "Outbound email credentials for invites, receipts, and reminders.",
       },
       {
         key: "VAPID_*",
         required: false,
-        description: "Required only if you want web push notifications. Generate with pnpm gen:vapid.",
+        description: "Required only if you want web push notifications. Generate with npx web-push generate-vapid-keys.",
       },
       {
-        key: "S3_*",
+        key: "UPLOAD_*",
         required: false,
-        description: "If unset, uploads fall back to /public/uploads on local disk.",
+        description: "Upload size and MIME type limits for images, WebP files, and PDFs.",
       },
     ],
     callouts: [
       {
         tone: "tip",
-        title: "Generate AUTH_SECRET fast",
+        title: "Generate NEXTAUTH_SECRET fast",
         body: "Run openssl rand -base64 32 in your terminal and paste the output as the value.",
       },
     ],
@@ -349,26 +380,26 @@ S3_SECRET_KEY=...`,
   {
     id: "database",
     label: "Database Setup",
-    title: "Create the schema & seed data",
+    title: "Connect MongoDB & seed data",
     intro:
-      "PropertyPro uses Drizzle migrations. After pointing DATABASE_URL at an empty database, the schema is created in a single command.",
+      "PropertyPro stores application data in MongoDB. Create a MongoDB Atlas cluster or self-hosted database, then point MONGODB_URI at it before starting the app.",
     icon: Database02FreeIcons,
     accent: "emerald",
     steps: [
       {
-        title: "Create an empty database",
-        body: "Use psql or any GUI to create a fresh database for PropertyPro to own.",
+        title: "Create a MongoDB database",
+        body: "Create a MongoDB Atlas cluster and database named propertypro, or prepare a self-hosted MongoDB instance.",
         code: {
           lang: "bash",
-          body: 'createdb propertypro\n# or via psql:\npsql -c "CREATE DATABASE propertypro;"',
+          body: "# MongoDB Atlas example\nMONGODB_URI=mongodb+srv://username:password@cluster0.kbnje.mongodb.net/propertypro",
         },
       },
       {
-        title: "Run migrations",
-        body: "Applies all schema migrations bundled with the release.",
+        title: "Allow network access",
+        body: "In MongoDB Atlas, add your local IP address for development and your hosting provider's outbound IPs for production.",
         code: {
-          lang: "bash",
-          body: "pnpm db:migrate",
+          lang: "txt",
+          body: "Atlas → Network Access → Add IP Address",
         },
       },
       {
@@ -380,11 +411,11 @@ S3_SECRET_KEY=...`,
         },
       },
       {
-        title: "Inspect with Drizzle Studio",
-        body: "Open a local web UI to browse and edit data. Useful for debugging.",
+        title: "Inspect with MongoDB Compass",
+        body: "Use MongoDB Compass or the Atlas Data Explorer to browse collections and verify seeded records.",
         code: {
-          lang: "bash",
-          body: "pnpm db:studio",
+          lang: "txt",
+          body: "mongodb+srv://username:password@cluster0.kbnje.mongodb.net/propertypro",
         },
       },
     ],
@@ -392,7 +423,7 @@ S3_SECRET_KEY=...`,
       {
         tone: "warn",
         title: "Production: skip the seed",
-        body: "Never run pnpm db:seed against a live database — it inserts demo records with predictable IDs.",
+        body: "Never run pnpm db:seed against a live database — it inserts demo records and accounts intended for evaluation.",
       },
     ],
   },
@@ -485,17 +516,17 @@ S3_SECRET_KEY=...`,
       {
         icon: Mail01FreeIcons,
         title: "Resend (recommended)",
-        body: "Easiest for new buyers. Free tier covers most small portfolios. SMTP_HOST=smtp.resend.com, SMTP_USER=resend.",
+        body: "Easiest for new buyers. Free tier covers most small portfolios. EMAIL_SERVER_HOST=smtp.resend.com, EMAIL_SERVER_USER=resend.",
       },
       {
         icon: Mail01FreeIcons,
         title: "SendGrid",
-        body: "Higher limits and better deliverability for large portfolios. SMTP_HOST=smtp.sendgrid.net.",
+        body: "Higher limits and better deliverability for large portfolios. EMAIL_SERVER_HOST=smtp.sendgrid.net.",
       },
       {
         icon: Mail01FreeIcons,
         title: "Postmark",
-        body: "Best for transactional-only email. SMTP_HOST=smtp.postmarkapp.com.",
+        body: "Best for transactional-only email. EMAIL_SERVER_HOST=smtp.postmarkapp.com.",
       },
       {
         icon: Mail01FreeIcons,
@@ -507,7 +538,7 @@ S3_SECRET_KEY=...`,
       {
         tone: "tip",
         title: "Verify your sender domain",
-        body: "Always set up SPF, DKIM, and DMARC for SMTP_FROM's domain — without it, emails land in spam.",
+        body: "Always set up SPF, DKIM, and DMARC for EMAIL_FROM's domain — without it, emails land in spam.",
       },
     ],
   },
@@ -630,14 +661,14 @@ export const defaultLocale = "en";`,
       },
       {
         title: "Add environment variables",
-        body: "Project Settings → Environment Variables. Paste every key from your .env.local. Set NEXT_PUBLIC_APP_URL to your Vercel URL.",
+        body: "Project Settings → Environment Variables. Paste every key from your .env.local. Set APP_URL, NEXTAUTH_URL, and AUTH_URL to your Vercel URL.",
       },
       {
-        title: "Run migrations against production",
-        body: "From your local machine, point DATABASE_URL at the production DB and run migrations once.",
+        title: "Connect MongoDB Atlas",
+        body: "Add Vercel's outbound access to MongoDB Atlas Network Access, then set MONGODB_URI in Vercel before deploying.",
         code: {
           lang: "bash",
-          body: "DATABASE_URL=postgres://prod-url pnpm db:migrate",
+          body: "MONGODB_URI=mongodb+srv://username:password@cluster0.kbnje.mongodb.net/propertypro",
         },
       },
       {
@@ -651,7 +682,7 @@ export const defaultLocale = "en";`,
     label: "Deploy to VPS / Docker",
     title: "Self-host on your own server",
     intro:
-      "If you'd rather run on a VPS, PropertyPro ships with a production-ready Dockerfile and a sample docker-compose.yml that bundles Postgres.",
+      "If you'd rather run on a VPS, PropertyPro ships with a production-ready Dockerfile and a sample docker-compose.yml that can run MongoDB alongside the app.",
     icon: ContainerFreeIcons,
     accent: "slate",
     codes: [
@@ -663,19 +694,21 @@ export const defaultLocale = "en";`,
     build: .
     ports: ["3000:3000"]
     env_file: .env.local
-    depends_on: [db]
-  db:
-    image: postgres:16
     environment:
-      POSTGRES_USER: propertypro
-      POSTGRES_PASSWORD: change-me
-      POSTGRES_DB: propertypro
+      MONGODB_URI: mongodb://propertypro:change-me@mongo:27017/propertypro?authSource=admin
+    depends_on: [mongo]
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: propertypro
+      MONGO_INITDB_ROOT_PASSWORD: change-me
     volumes:
-      - pgdata:/var/lib/postgresql/data
-    ports: ["5432:5432"]
+      - mongodata:/data/db
+    ports: ["27017:27017"]
 
 volumes:
-  pgdata:`,
+  mongodata:`,
       },
     ],
     steps: [
@@ -688,11 +721,11 @@ volumes:
         },
       },
       {
-        title: "Run migrations inside the container",
-        body: "Schema needs to be applied once on first boot.",
+        title: "Seed demo data inside the container",
+        body: "Load demo records only when you are setting up a test or evaluation instance.",
         code: {
           lang: "bash",
-          body: "docker compose exec app pnpm db:migrate",
+          body: "docker compose exec app pnpm db:seed",
         },
       },
       {
@@ -711,7 +744,7 @@ volumes:
       {
         tone: "tip",
         title: "Use a managed database",
-        body: "Self-hosting Postgres works but you'll own backups, replication, and upgrades. Supabase or Neon offload that work.",
+        body: "Self-hosting MongoDB works but you'll own backups, replication, and upgrades. MongoDB Atlas offloads that work.",
       },
     ],
   },
@@ -733,8 +766,8 @@ volumes:
         body: "Vercel auto-verifies once DNS propagates. Caddy reissues the certificate on the next request.",
       },
       {
-        title: "Update NEXT_PUBLIC_APP_URL",
-        body: "Switch the env var to https://yourdomain.com and redeploy. This is used in emails and OAuth callbacks.",
+        title: "Update application URLs",
+        body: "Switch APP_URL, NEXTAUTH_URL, and AUTH_URL to https://yourdomain.com and redeploy. These are used in emails and auth callbacks.",
       },
     ],
   },
@@ -790,19 +823,19 @@ volumes:
         body: "Use git or your favorite diff tool to merge the new files. Your /messages and /public assets are safe to keep as-is.",
       },
       {
-        title: "Run migrations",
-        body: "Each release that touches the schema includes new migrations. Apply them once.",
+        title: "Install and rebuild",
+        body: "Install dependencies and run a production build after merging each release.",
         code: {
           lang: "bash",
-          body: "pnpm install\npnpm db:migrate\npnpm build",
+          body: "pnpm install\npnpm build",
         },
       },
       {
         title: "Schedule database backups",
-        body: "Use your hosting provider's automated backups (Supabase / Neon / RDS) or set up nightly pg_dump on a VPS.",
+        body: "Use MongoDB Atlas automated backups or set up nightly mongodump on a VPS.",
         code: {
           lang: "bash",
-          body: "# Cron: nightly backup at 02:00\n0 2 * * * pg_dump $DATABASE_URL > /backups/propertypro-$(date +\\%F).sql",
+          body: "# Cron: nightly backup at 02:00\n0 2 * * * mongodump --uri=\"$MONGODB_URI\" --archive=/backups/propertypro-$(date +\\%F).archive --gzip",
         },
       },
     ],
@@ -818,8 +851,8 @@ volumes:
     bullets: [
       {
         icon: Database02FreeIcons,
-        title: "DATABASE_URL refused / SSL required",
-        body: "Add ?sslmode=require to your connection string when using Supabase, Neon, or RDS.",
+        title: "MONGODB_URI connection refused",
+        body: "Check the username, password, database name, and Atlas Network Access allowlist. For self-hosted MongoDB, confirm the authSource value.",
       },
       {
         icon: CreditCardFreeIcons,
@@ -844,7 +877,7 @@ volumes:
       {
         icon: FolderFileStorageFreeIcons,
         title: "File uploads silently fail",
-        body: "Check S3_* variables, or ensure /public/uploads is writable when using local-disk fallback.",
+        body: "Check R2_* variables, NEXT_PUBLIC_R2_PUBLIC_URL, upload limits, and whether your Cloudflare R2 bucket allows public reads from the configured URL.",
       },
     ],
   },
@@ -1110,13 +1143,13 @@ export default function DocsPage() {
               <span className="font-medium text-slate-900">v2.0.0</span> is out —
               finance module, support tickets, push notifications.
             </span>
-            <a
+            <Link
               href="/changelog"
               className="inline-flex items-center gap-1 font-medium text-blue-600 hover:text-blue-700"
             >
               Read changelog
               <HugeiconsIcon icon={ArrowUpRight01FreeIcons} className="size-3" />
-            </a>
+            </Link>
           </div>
           <button
             type="button"
@@ -1173,7 +1206,7 @@ export default function DocsPage() {
 
           <nav className="mt-4 -mb-px flex flex-wrap items-center gap-1 overflow-x-auto">
             {tabs.map((t) => (
-              <a
+              <Link
                 key={t.label}
                 href={t.href}
                 className={cn(
@@ -1187,7 +1220,7 @@ export default function DocsPage() {
                 {t.active && (
                   <span className="absolute right-3 -bottom-px left-3 h-0.5 rounded-full bg-blue-600" />
                 )}
-              </a>
+              </Link>
             ))}
           </nav>
         </div>
@@ -1245,7 +1278,7 @@ export default function DocsPage() {
             </div>
 
             <div className="border-t border-slate-200 px-5 py-4">
-              <a
+              <Link
                 href="/"
                 className="flex items-center gap-2.5 rounded-lg p-2 text-sm transition-colors hover:bg-slate-50"
               >
@@ -1258,7 +1291,7 @@ export default function DocsPage() {
                     PropertyPro
                   </span>
                 </span>
-              </a>
+              </Link>
             </div>
           </div>
         </aside>
@@ -1647,27 +1680,27 @@ export default function DocsPage() {
               <p className="px-2 text-[11px] font-semibold tracking-wider text-slate-500 uppercase">
                 Related
               </p>
-              <a
+              <Link
                 href="/user-manual"
                 className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
               >
                 <HugeiconsIcon icon={Book02FreeIcons} className="size-3.5" />
                 User Manual
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/changelog"
                 className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
               >
                 <HugeiconsIcon icon={CommandFreeIcons} className="size-3.5" />
                 Changelog
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/#faq"
                 className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
               >
                 <HugeiconsIcon icon={HelpCircleFreeIcons} className="size-3.5" />
                 FAQ
-              </a>
+              </Link>
             </div>
           </div>
         </aside>
