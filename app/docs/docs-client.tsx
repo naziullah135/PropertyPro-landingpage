@@ -282,7 +282,7 @@ NEXTAUTH_SECRET=your-nextauth-secret
 AUTH_TRUST_HOST=true
 AUTH_URL=http://localhost:3000
 
-# Cloudflare R2
+# Cloudflare R2 (Replace with your actual keys from https://dash.cloudflare.com)
 R2_ACCOUNT_ID=your-r2-account-id
 R2_ACCESS_KEY_ID=your-r2-access-key-id
 R2_SECRET_ACCESS_KEY=your-r2-secret-access-key
@@ -339,9 +339,29 @@ VAPID_SUBJECT=mailto:admin@propertypro.app`,
         description: "Public URL of your deployment, used in emails, callbacks, and auth redirects.",
       },
       {
-        key: "R2_*",
+        key: "R2_ACCOUNT_ID",
         required: true,
-        description: "Cloudflare R2 credentials and public URL for uploaded property files.",
+        description: "Cloudflare account ID used to build the R2 S3 endpoint.",
+      },
+      {
+        key: "R2_ACCESS_KEY_ID",
+        required: true,
+        description: "Access Key ID from a Cloudflare R2 API token with object read/write access.",
+      },
+      {
+        key: "R2_SECRET_ACCESS_KEY",
+        required: true,
+        description: "Secret Access Key for the same R2 API token. Store it once; Cloudflare does not show it again.",
+      },
+      {
+        key: "R2_BUCKET_NAME",
+        required: true,
+        description: "Name of the bucket that stores uploaded property photos and documents.",
+      },
+      {
+        key: "R2_PUBLIC_URL / NEXT_PUBLIC_R2_PUBLIC_URL",
+        required: true,
+        description: "Public origin for reading uploaded files, either a production custom domain or a development r2.dev URL.",
       },
       {
         key: "STRIPE_SECRET_KEY",
@@ -466,6 +486,92 @@ VAPID_SUBJECT=mailto:admin@propertypro.app`,
         tone: "note",
         title: "Change the demo password",
         body: "First action in production: log in, open Settings → Profile, and rotate the seeded password.",
+      },
+    ],
+  },
+  {
+    id: "cloudflare-r2",
+    label: "Cloudflare R2",
+    title: "Configure file storage with Cloudflare R2",
+    intro:
+      "PropertyPro uses Cloudflare R2 for property images, tenant documents, and other uploaded files. Configure one private write path through R2 API credentials and one public read URL for displaying saved files.",
+    icon: FolderFileStorageFreeIcons,
+    accent: "cyan",
+    steps: [
+      {
+        title: "Create an R2 bucket",
+        body: "In Cloudflare, open Storage & databases -> R2 and create a bucket for PropertyPro uploads. Use a lowercase bucket name with numbers and hyphens only, then place that exact bucket name in R2_BUCKET_NAME.",
+        code: {
+          lang: "bash",
+          body: "R2_BUCKET_NAME=your-r2-bucket-name",
+        },
+      },
+      {
+        title: "Create a scoped R2 API token",
+        body: "From the R2 overview, open Manage API Tokens, create an API token with Object Read & Write permission, and scope it to the PropertyPro bucket. Copy the Access Key ID, Secret Access Key, and account ID before leaving the confirmation screen.",
+        code: {
+          lang: "bash",
+          body: `R2_ACCOUNT_ID=your-r2-account-id
+R2_ACCESS_KEY_ID=your-r2-access-key-id
+R2_SECRET_ACCESS_KEY=your-r2-secret-access-key
+R2_BUCKET_NAME=your-r2-bucket-name`,
+        },
+      },
+      {
+        title: "Enable public file delivery",
+        body: "For production, connect a custom domain such as assets.yourdomain.com to the bucket. For local testing only, you may enable the Cloudflare-managed r2.dev public development URL. Set both public URL variables to the exact origin with no trailing slash.",
+        code: {
+          lang: "bash",
+          body: `# Production custom domain
+R2_PUBLIC_URL=https://your-custom-domain.com
+NEXT_PUBLIC_R2_PUBLIC_URL=https://your-custom-domain.com
+
+# Local or staging with R2 public development URL
+# R2_PUBLIC_URL=https://pub-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.r2.dev
+# NEXT_PUBLIC_R2_PUBLIC_URL=https://pub-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.r2.dev`,
+        },
+      },
+      {
+        title: "Allow the image host in Next.js",
+        body: "The bundled next.config.ts already allows r2.dev and r2.cloudflarestorage.com image hosts. If you use a custom R2 domain and render uploaded images through next/image, add that hostname to images.remotePatterns, then rebuild.",
+        code: {
+          lang: "ts",
+          title: "next.config.ts",
+          body: `images: {
+  remotePatterns: [
+    {
+      protocol: "https",
+      hostname: "assets.yourdomain.com",
+      port: "",
+      pathname: "/**",
+      search: "",
+    },
+  ],
+}`,
+        },
+      },
+      {
+        title: "Verify uploads",
+        body: "Restart the app after changing environment variables, upload a property image or tenant document, then open the saved file URL. If the upload succeeds but previews fail, check the public bucket URL and image remote pattern first.",
+      },
+    ],
+    codes: [
+      {
+        lang: "txt",
+        title: "R2 S3 endpoint format",
+        body: "https://<ACCOUNT_ID>.r2.cloudflarestorage.com",
+      },
+    ],
+    callouts: [
+      {
+        tone: "warn",
+        title: "Keep write credentials server-only",
+        body: "Never expose R2_ACCESS_KEY_ID or R2_SECRET_ACCESS_KEY in NEXT_PUBLIC_* variables. Only NEXT_PUBLIC_R2_PUBLIC_URL should be readable by the browser.",
+      },
+      {
+        tone: "note",
+        title: "Use custom domains in production",
+        body: "Cloudflare's r2.dev public development URLs are intended for non-production traffic. A custom domain gives you normal Cloudflare cache, access control, WAF, and bot-management options.",
       },
     ],
   },
@@ -891,7 +997,7 @@ const navGroups: { label: string; ids: string[] }[] = [
   },
   {
     label: "Configuration",
-    ids: ["stripe", "email", "push", "branding", "languages"],
+    ids: ["cloudflare-r2", "stripe", "email", "push", "branding", "languages"],
   },
   {
     label: "Deployment",
@@ -1601,7 +1707,7 @@ export default function DocsPage() {
                 Updates
               </a>
               <span className="text-slate-300">·</span>
-              <span>Last updated April 28, 2026</span>
+              <span>Last updated May 2, 2026</span>
             </div>
             <a
               href="#overview"
