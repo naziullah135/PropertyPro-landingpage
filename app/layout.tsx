@@ -79,6 +79,7 @@ export default function RootLayout({
         >
           {children}
         </PlausibleProvider>
+        <script src="https://solvio-staging.neurolightstudio.com/widget.js?key=ste_2d04b856649a03bf4af4b92fdac08d13" async></script>
       </body>
     </html>
   );
