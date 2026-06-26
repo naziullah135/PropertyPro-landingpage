@@ -29,6 +29,26 @@ type Release = {
 
 const releases: Release[] = [
   {
+    version: "2.1.0",
+    level: "minor",
+    date: "June 19, 2026",
+    title: "Preference Settings & RTL Mode",
+    sections: {
+      features: [
+        "Dedicated preference settings, inspired by Storify",
+        "RTL (right-to-left) mode support",
+      ],
+      improvements: [
+        "Optimized RTL mode behavior across the app",
+        "Improved sidebar SVG chain design",
+        "Enhanced radio icon visibility in the sidebar",
+      ],
+      fixes: [
+        "Fixed apparent mode active color issue",
+      ],
+    },
+  },
+  {
     version: "2.0.0",
     level: "major",
     date: "April 23, 2026",
@@ -192,12 +212,12 @@ export default function ChangelogPage() {
       <JsonLd data={createBreadcrumbSchema("Changelog", "/changelog")} />
       <Navbar />
 
-      <section className="px-6 pt-12 pb-20 md:px-12 md:pt-20 md:pb-28">
+      <section className="px-6 pt-12 pb-20 md:px-12 md:pt-20 md:pb-20">
         <div className="mx-auto max-w-5xl">
           {/* Page header */}
           <div className="text-center">
             <p className="text-sm font-medium text-teal-700">Changelog</p>
-            <h1 className="mt-3 text-4xl font-bold tracking-tight text-balance text-slate-950 md:text-6xl">
+            <h1 className="mt-3 text-2xl font-bold tracking-tight text-balance text-slate-950 md:text-5xl">
               What&apos;s new in PropertyPro
             </h1>
             <p className="mx-auto mt-5 max-w-xl text-base text-slate-500 sm:text-lg">
@@ -206,7 +226,7 @@ export default function ChangelogPage() {
           </div>
 
           {/* Releases */}
-          <div className="mt-16 space-y-8 md:mt-20 md:space-y-10">
+          <div className="mt-8 space-y-6  md:space-y-8">
             {releases.map((release) => (
               <article
                 key={release.version}
