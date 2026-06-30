@@ -29,6 +29,7 @@ type MenuItem = {
   title: string;
   description: string;
   icon: IconSvgElement;
+  favicon?: string;
   href: string;
   badge?: string;
   externalIndicator?: boolean;
@@ -55,22 +56,25 @@ const NAV: MenuConfig[] = [
         title: "PropertyPro",
         description: "Real estate management platform",
         icon: HomeFreeIcons,
+        favicon: "/icon-propertypro.png",
         href: "https://codecanyon.net/item/propertypro-property-tenant-management-software-nextjs-mongodb/60300696",
+        externalIndicator: true,
+      },
+      {
+        title: "Storify",
+        description: "AI-Powered eCommerce platform for modern stores",
+        icon: ShoppingCart01FreeIcons,
+        favicon: "/icon-storify.png",
+        href: "https://codecanyon.net/item/storify-aipowered-ecommerce-platform-with-pos-multi-vendor-pwa-analytics-js-script/63421937",
         externalIndicator: true,
       },
       {
         title: "Solvio",
         description: "Realtime customer support & ticketing",
         icon: Chat01FreeIcons,
+        favicon: "/icon-solvio.png",
         href: "https://codecanyon.net/item/solvio-realtime-customer-support-ticketing-system-with-knowledge-base-email-notifications-mu/61429020",
-      },
-      {
-        title: "Ecommerce",
-        description: "Full-featured online store solution",
-        icon: ShoppingCart01FreeIcons,
-        href: "#",
-        badge: "Coming Soon",
-        disabled: true,
+        externalIndicator: true,
       },
     ],
   },
@@ -186,12 +190,14 @@ export function Navbar() {
     >
       <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-6 md:px-12">
         {/* Logo */}
-        <Link href="/">
+        <Link href="/" className="flex items-center">
           <Image
             src="/logo-light.png"
             alt="PropertyPro"
-            width={200}
-            height={100}
+            width={195}
+            height={36}
+            className="h-9 w-auto"
+            priority
           />
         </Link>
 
@@ -213,10 +219,10 @@ export function Navbar() {
                       onClick={() => toggleMenu(i)}
                       aria-expanded={isOpen}
                       className={cn(
-                        "flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                        "flex items-center gap-1 rounded-lg px-3 py-2 text-base font-semibold transition-colors",
                         isOpen
                           ? "text-blue-600"
-                          : "text-slate-600 hover:text-slate-900",
+                          : "text-slate-700 hover:text-slate-900",
                       )}
                     >
                       {item.label}
@@ -231,7 +237,7 @@ export function Navbar() {
                   ) : (
                     <Link
                       href={item.href}
-                      className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:text-slate-900"
+                      className="rounded-lg px-3 py-2 text-base font-semibold text-slate-700 transition-colors hover:text-slate-900"
                     >
                       {item.label}
                     </Link>
@@ -259,7 +265,7 @@ export function Navbar() {
           >
             <Button
               variant="outline"
-              className="hidden h-10 rounded-full border-slate-200 bg-white px-5 text-sm font-medium text-slate-900 hover:bg-slate-50 sm:inline-flex"
+              className="hidden h-10 rounded-full border-slate-200 bg-white px-5 text-sm font-bold text-slate-900 hover:bg-slate-50 sm:inline-flex"
             >
               Buy Now
             </Button>
@@ -270,7 +276,7 @@ export function Navbar() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Button className="h-10 cursor-pointer text-center rounded-full bg-blue-600 px-5 text-sm font-medium text-white hover:bg-blue-700">
+            <Button className="h-10 cursor-pointer text-center rounded-full bg-blue-600 px-5 text-sm font-bold text-white hover:bg-blue-700">
               Live Preview
             </Button>
           </Link>
@@ -327,20 +333,29 @@ function MegaMenu({
                   isProducts ? "size-10 rounded-2xl" : "size-9 rounded-lg",
                 )}
               >
-                <HugeiconsIcon
-                  icon={item.icon}
-                  className={isProducts ? "size-5" : "size-4"}
-                />
+                {isProducts && item.favicon ? (
+                  <Image
+                    src={item.favicon}
+                    alt={item.title}
+                    width={40}
+                    height={40}
+                  />
+                ) : (
+                  <HugeiconsIcon
+                    icon={item.icon}
+                    className={isProducts ? "size-5" : "size-4"}
+                  />
+                )}
               </span>
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <p className="text-sm font-semibold text-slate-900">
+                  <p className="text-md font-bold text-slate-900">
                     {item.title}
                   </p>
                   {item.externalIndicator && (
                     <HugeiconsIcon
                       icon={ArrowUpRight01FreeIcons}
-                      className="size-3 text-slate-400"
+                      className="size-4 font-bold text-slate-400"
                     />
                   )}
                   {item.badge && (

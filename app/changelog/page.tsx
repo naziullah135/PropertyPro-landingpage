@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   PlayCircleFreeIcons,
@@ -28,6 +29,30 @@ type Release = {
 };
 
 const releases: Release[] = [
+  {
+    version: "2.2.0",
+    level: "major",
+    date: "June 30, 2026",
+    title: "Payment Gateways & Account Management",
+    sections: {
+      features: [
+        "PayPal, Razorpay, and Paystack integrations for payment collection",
+        "Password change, reset, and email verification management from the UI",
+        "SMTP setup and test tools in the admin dashboard",
+      ],
+      improvements: [
+        "Lease start date can now be set to a past date",
+        "Optimized delete behavior to keep finance data accurate",
+      ],
+      fixes: [
+        "Fixed PWA app icon and branding issue",
+        "Resolved dynamic favicon issue",
+        "Fixed full branding feature isolation issue",
+        "Replaced hardcoded user data with dynamic values",
+        "Synchronized system overview data",
+      ],
+    },
+  },
   {
     version: "2.1.0",
     level: "minor",
@@ -306,20 +331,32 @@ export default function ChangelogPage() {
               property workflow.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <Button
-                variant="outline"
-                className="h-11 rounded-full border-transparent bg-white px-5 text-sm font-medium text-slate-900 hover:bg-slate-100"
+              <Link
+                href="https://propertypro-live.neurolightstudio.com/dashboard"
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <HugeiconsIcon icon={PlayCircleFreeIcons} className="size-4" />
-                View Live Demo
-              </Button>
-              <Button className="h-11 rounded-full bg-blue-600 px-5 text-sm font-medium text-white hover:bg-blue-700">
-                Purchase Now
-                <HugeiconsIcon
-                  icon={ArrowRight01FreeIcons}
-                  className="size-4"
-                />
-              </Button>
+                <Button
+                  variant="outline"
+                  className="h-11 rounded-full border-transparent bg-white px-5 text-sm font-medium text-slate-900 hover:bg-slate-100"
+                >
+                  <HugeiconsIcon icon={PlayCircleFreeIcons} className="size-4" />
+                  View Live Demo
+                </Button>
+              </Link>
+              <Link
+                href="https://codecanyon.net/item/propertypro-property-tenant-management-software-nextjs-mongodb/60300696"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button className="h-11 rounded-full bg-blue-600 px-5 text-sm font-medium text-white hover:bg-blue-700">
+                  Purchase Now
+                  <HugeiconsIcon
+                    icon={ArrowRight01FreeIcons}
+                    className="size-4"
+                  />
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
