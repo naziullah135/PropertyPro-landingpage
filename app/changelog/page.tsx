@@ -30,31 +30,14 @@ type Release = {
 
 const releases: Release[] = [
   {
-    version: "2.4.0",
-    level: "minor",
-    date: "July 22, 2026",
-    title: "Self-Service Tenant Onboarding",
-    sections: {
-      features: [
-        "Public self-service signup — prospective tenants apply online with their personal, employment, and emergency-contact details",
-        "New signups arrive in Tenants → Applications as pending applications for staff to review and approve",
-        "Applicants are held out of the app until an admin approves them: sign-in stays blocked while an application is pending or after it's been rejected",
-      ],
-      improvements: [
-        "Redesigned multi-section signup form capturing date of birth, employment (employer, position, income, start date), and an emergency contact",
-        "Sign-in now shows a specific message for pending and rejected applications instead of a generic error",
-        "Applications list merges self-service signups with property applications, always surfacing the newest signups first",
-        "Signup validates applicant age (18+) and treats employment details as all-or-nothing to keep applications complete",
-      ],
-    },
-  },
-  {
     version: "2.3.0",
     level: "major",
     date: "July 22, 2026",
     title: "Settings Platform, Media Library & Finance Hardening",
     sections: {
       features: [
+        "Self-service tenant onboarding — prospective tenants apply online with their personal, employment, and emergency-contact details, arriving in Tenants → Applications as pending applications for staff to review and approve",
+        "Applicants are held out of the app until an admin approves them: sign-in stays blocked while an application is pending or after it's been rejected",
         "Storage settings with a Cloudflare R2 or local-disk provider and a built-in credential test",
         "Searchable, paginated media library that indexes every upload across storage backends",
         "Property Setup module — property types, unit types, amenities, and new-unit defaults are now admin-configurable instead of hardcoded",
@@ -67,6 +50,9 @@ const releases: Release[] = [
         "Active session tracking in user management, including sessions created before tracking existed",
       ],
       improvements: [
+        "Redesigned multi-section signup form capturing date of birth, employment (employer, position, income, start date), and an emergency contact, with 18+ age validation and all-or-nothing employment fields",
+        "Sign-in now shows a specific message for pending and rejected tenant applications instead of a generic error",
+        "Applications list merges self-service signups with property applications, always surfacing the newest signups first",
         "Money handling rebuilt on pure, unit-tested algorithms covering revenue, invoices, late fees, refunds, and deposit accounting",
         "Stronger lease lifecycle: transitions, overlap rules, termination, occupancy sync, late fees, and automatic invoicing",
         "One reconciled gateway attempt per invoice across Stripe, PayPal, Razorpay, and Paystack",
