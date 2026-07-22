@@ -30,6 +30,25 @@ type Release = {
 
 const releases: Release[] = [
   {
+    version: "2.4.0",
+    level: "minor",
+    date: "July 22, 2026",
+    title: "Self-Service Tenant Onboarding",
+    sections: {
+      features: [
+        "Public self-service signup — prospective tenants apply online with their personal, employment, and emergency-contact details",
+        "New signups arrive in Tenants → Applications as pending applications for staff to review and approve",
+        "Applicants are held out of the app until an admin approves them: sign-in stays blocked while an application is pending or after it's been rejected",
+      ],
+      improvements: [
+        "Redesigned multi-section signup form capturing date of birth, employment (employer, position, income, start date), and an emergency contact",
+        "Sign-in now shows a specific message for pending and rejected applications instead of a generic error",
+        "Applications list merges self-service signups with property applications, always surfacing the newest signups first",
+        "Signup validates applicant age (18+) and treats employment details as all-or-nothing to keep applications complete",
+      ],
+    },
+  },
+  {
     version: "2.3.0",
     level: "major",
     date: "July 22, 2026",
