@@ -39,6 +39,7 @@ import {
   PaintBrush02FreeIcons,
   TranslateFreeIcons,
   Globe02FreeIcons,
+  Location01FreeIcons,
   CommandFreeIcons,
   ContainerFreeIcons,
   CertificateFreeIcons,
@@ -97,14 +98,14 @@ const sections: Section[] = [
     label: "Overview",
     title: "Welcome to PropertyPro",
     intro:
-      "PropertyPro is a complete property management application built with Next.js 16, React 19, and MongoDB. This documentation covers everything from your first install to deploying in production.",
+      "PropertyPro is a complete property management application built with Next.js 16, React 19, and MongoDB. Version 3.0 adds a public marketing website with online rental applications. This documentation covers everything from your first install to deploying in production.",
     icon: RocketFreeIcons,
     accent: "blue",
     bullets: [
       {
         icon: Book02FreeIcons,
         title: "What's in the package",
-        body: "Full source code, database schema, seed data, and a self-contained PWA-ready Next.js app.",
+        body: "Full source code, database schema, seed data, a PWA-ready dashboard, and a public marketing site with a rental application checkout.",
       },
       {
         icon: ShieldFreeIcons,
@@ -114,7 +115,7 @@ const sections: Section[] = [
       {
         icon: SparklesFreeIcons,
         title: "Stack",
-        body: "Next.js 16, React 19 + Compiler, TypeScript, Tailwind CSS v4, MongoDB, Stripe.",
+        body: "Next.js 16, React 19 + Compiler, TypeScript, Tailwind CSS v4, MongoDB, Better Auth, Stripe.",
       },
       {
         icon: CustomerSupportFreeIcons,
@@ -124,9 +125,102 @@ const sections: Section[] = [
     ],
     callouts: [
       {
+        tone: "warn",
+        title: "Upgrading from v2.x? Run the migration first",
+        body: "v3.0 replaces NextAuth with Better Auth and needs a one-time database migration — pnpm db:migrate-better-auth. Until it runs, every API call returns 503 and sign-in reports \"Invalid email or password\". See Upgrading to v3.0 before you do anything else.",
+      },
+      {
         tone: "tip",
         title: "Looking for end-user docs?",
         body: "If you're configuring tenants, leases, and day-to-day workflows, head to the User Manual instead.",
+      },
+    ],
+  },
+  {
+    id: "upgrade-v3",
+    label: "Upgrading to v3.0",
+    title: "v2.x → v3.0: run the auth migration",
+    intro:
+      "Fresh install? Skip this section entirely. Upgrading from any 2.x version? v3.0 replaces NextAuth with Better Auth and needs a one-time database migration. The app refuses to serve requests until it has run.",
+    icon: RefreshFreeIcons,
+    accent: "rose",
+    codes: [
+      {
+        lang: "bash",
+        title: "The one command that matters",
+        body: `# 1. Preview — writes nothing
+pnpm db:migrate-better-auth --dry-run
+
+# 2. Run it
+pnpm db:migrate-better-auth`,
+      },
+    ],
+    steps: [
+      {
+        title: "Back up first",
+        body: "Settings → Backups → Create backup, or run mongodump. This is the entire rollback plan — do not skip it.",
+        code: {
+          lang: "bash",
+          body: 'mongodump --uri="$MONGODB_URI" --archive=pre-v3-upgrade.archive --gzip',
+        },
+      },
+      {
+        title: "Copy the v3.0 files and install",
+        body: "Preserve .env.local and your local ./uploads directory.",
+        code: {
+          lang: "bash",
+          body: "pnpm install",
+        },
+      },
+      {
+        title: "Leave your environment alone",
+        body: "No change is required. v3.0 reads BETTER_AUTH_SECRET first and falls back to AUTH_SECRET, then NEXTAUTH_SECRET. If you switch to the new names, copy the same value across — a new secret signs everyone out.",
+      },
+      {
+        title: "Run the migration",
+        body: "Additive and safe to re-run: it copies password hashes rather than moving them, and skips anything already migrated. If it is interrupted, just run it again.",
+        code: {
+          lang: "bash",
+          body: "pnpm db:migrate-better-auth --dry-run   # preview\npnpm db:migrate-better-auth             # apply",
+        },
+      },
+      {
+        title: "Rebuild and verify",
+        body: "Sign in with an existing account and its existing password, check that Settings → Security lists your session, and confirm terminating a session signs that device out.",
+        code: {
+          lang: "bash",
+          body: "pnpm build\npnpm start",
+        },
+      },
+      {
+        title: "Run the optional migrations",
+        body: "Not required to boot, but each fixes something. db:migrate-email-index lets you re-create a tenant whose account was deleted; db:backfill-coordinates puts pre-3.0 properties on the new maps.",
+        code: {
+          lang: "bash",
+          body: "pnpm db:migrate-email-index\npnpm db:backfill-coordinates",
+        },
+      },
+    ],
+    callouts: [
+      {
+        tone: "warn",
+        title: "Until the migration runs, every API call returns 503",
+        body: "\"This deployment is running database schema v0 but the application requires v1.\" That is deliberate — v3.0 refuses to serve an un-migrated database rather than answering correct passwords with \"invalid credentials\". Sign-in is not covered by the gate, so it reports \"Invalid email or password\" instead; same cause, same fix.",
+      },
+      {
+        tone: "note",
+        title: "What the upgrade does and does not touch",
+        body: "Passwords are unchanged — nobody has to reset anything. Users, properties, leases, payments, and tenants are untouched. Everyone is signed out once, because pre-3.0 logins were JWT-based and have no server-side record to convert.",
+      },
+      {
+        tone: "warn",
+        title: "Customized files: one import moved",
+        body: "v3.0 changed 74 files mechanically. If you edited any of them, change next-auth/react to @/lib/auth-client — useSession, signIn, and signOut keep the same signatures. The old next-auth package is still installed so your build doesn't break, but it is scheduled for removal in v3.1.",
+      },
+      {
+        tone: "tip",
+        title: "Contacting support about an upgrade?",
+        body: "Include the output of pnpm db:migrate-better-auth --dry-run. It identifies the state of your database immediately. The bundled UPGRADE.md has the full reference, including rollback.",
       },
     ],
   },
@@ -149,15 +243,15 @@ const sections: Section[] = [
       },
       {
         title: "Copy env file",
-        body: "Duplicate the example env and fill in your database, Stripe, and SMTP credentials.",
+        body: "Duplicate the example env, then set MONGODB_URI and generate an auth secret. Everything else has a working default.",
         code: {
           lang: "bash",
-          body: "cp .env.example .env.local",
+          body: "cp .env.example .env.local\nopenssl rand -base64 32   # paste as BETTER_AUTH_SECRET",
         },
       },
       {
-        title: "Connect MongoDB & seed",
-        body: "Set MONGODB_URI, then load demo data so you can log in immediately.",
+        title: "Load sample data (optional)",
+        body: "Seeds demo properties, units, and tenants so the dashboard isn't empty. It creates no login.",
         code: {
           lang: "bash",
           body: "pnpm db:seed",
@@ -165,11 +259,26 @@ const sections: Section[] = [
       },
       {
         title: "Start the dev server",
-        body: "Open http://localhost:3000 — the demo admin is admin@propertypro.app / admin1234.",
+        body: "Runs on http://localhost:3000. Leave it running for the next step.",
         code: {
           lang: "bash",
           body: "pnpm dev",
         },
+      },
+      {
+        title: "Create your first administrator",
+        body: "Add SETUP_SECRET to .env.local, restart, then call the one-time bootstrap endpoint. Remove the secret afterwards.",
+        code: {
+          lang: "bash",
+          body: 'curl -X POST http://localhost:3000/api/setup/create-admin \\\n  -H "Content-Type: application/json" \\\n  -H "x-setup-secret: $SETUP_SECRET" \\\n  -d \'{"email":"you@example.com","password":"<strong password>","firstName":"Your","lastName":"Name"}\'',
+        },
+      },
+    ],
+    callouts: [
+      {
+        tone: "warn",
+        title: "No default login ships with PropertyPro",
+        body: "As of 3.0 there is no built-in admin account and no hardcoded password. The bootstrap endpoint above is the only way to create your first administrator, and it refuses to run once one exists.",
       },
     ],
   },
@@ -184,8 +293,8 @@ const sections: Section[] = [
     bullets: [
       {
         icon: TerminalFreeIcons,
-        title: "Node.js 20.11+",
-        body: "Use 20 LTS or 22. We do not support Node 18 due to React Compiler dependencies.",
+        title: "Node.js 20.19.28+",
+        body: "Enforced by the package engines field. Use 20 LTS or 22 — Node 18 is not supported due to React Compiler dependencies.",
       },
       {
         icon: TaskAdd02FreeIcons,
@@ -199,8 +308,8 @@ const sections: Section[] = [
       },
       {
         icon: CloudUploadFreeIcons,
-        title: "Object storage",
-        body: "Cloudflare R2 stores property photos, tenant documents, and uploaded files.",
+        title: "File storage",
+        body: "Local disk by default (./uploads). Switch UPLOAD_STORAGE_PROVIDER to cloud for Cloudflare R2 — recommended on serverless hosts, where local disk does not persist.",
       },
     ],
     callouts: [
@@ -229,7 +338,7 @@ const sections: Section[] = [
         body: "Extract the archive to a permanent location. The main folder is /propertypro.",
         code: {
           lang: "bash",
-          body: "unzip propertypro-v2.0.0.zip -d ~/projects/\ncd ~/projects/propertypro",
+          body: "unzip propertypro-v3.0.0.zip -d ~/projects/\ncd ~/projects/propertypro",
         },
       },
       {
@@ -245,7 +354,7 @@ const sections: Section[] = [
         body: "A quick smoke test confirms everything resolved correctly.",
         code: {
           lang: "bash",
-          body: "pnpm typecheck\npnpm lint",
+          body: "npx tsc --noEmit\npnpm lint",
         },
       },
     ],
@@ -262,138 +371,169 @@ const sections: Section[] = [
     label: "Environment Variables",
     title: "Configure .env.local",
     intro:
-      "All secrets live in .env.local. The included .env.example documents every key. Below is a complete MongoDB-ready example.",
+      "All secrets live in .env.local. The included .env.example documents every key — only the core block is needed to boot. Payment gateways, SMTP, and maps are normally configured in the admin panel and stored in the database; the matching env values are used only as a fallback when the admin field is empty.",
     icon: CodeFreeIcons,
     accent: "sky",
     codes: [
       {
         lang: "bash",
         title: ".env.local",
-        body: `# Database Configuration (MongoDB Atlas)
+        body: `# ---- Required: core --------------------------------------------------
+# MongoDB Atlas
 MONGODB_URI=mongodb+srv://username:password@cluster0.kbnje.mongodb.net/propertypro
-
-# Self-Hosted MongoDB
+# Self-hosted alternative
 # MONGODB_URI=mongodb://mongo:password@your_ip_address:27017/propertypro
 # MONGODB_DB=propertypro
 
-# NextAuth Configuration
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=your-nextauth-secret
-AUTH_TRUST_HOST=true
-AUTH_URL=http://localhost:3000
+# Public base URL, no trailing slash
+BETTER_AUTH_URL=http://localhost:3000
+# Generate with: openssl rand -base64 32
+BETTER_AUTH_SECRET=replace-with-a-long-random-string
 
-# Cloudflare R2 (Replace with your actual keys from https://dash.cloudflare.com)
-R2_ACCOUNT_ID=your-r2-account-id
-R2_ACCESS_KEY_ID=your-r2-access-key-id
-R2_SECRET_ACCESS_KEY=your-r2-secret-access-key
-R2_BUCKET_NAME=your-r2-bucket-name
-R2_PUBLIC_URL=https://your-custom-domain.com
-NEXT_PUBLIC_R2_PUBLIC_URL=https://your-custom-domain.com
+# Upgrading from v2.x? The old names are still read as a fallback
+# (BETTER_AUTH_SECRET -> AUTH_SECRET -> NEXTAUTH_SECRET). Keep the SAME
+# value — changing the secret signs everyone out.
+# NEXTAUTH_SECRET=
 
-# Stripe
+# ---- First admin (delete after use) ----------------------------------
+# Unlocks POST /api/setup/create-admin. Generate: openssl rand -hex 32
+# SETUP_SECRET=
+
+# ---- Application -----------------------------------------------------
+APP_NAME=PropertyPro
+APP_URL=http://localhost:3000
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+SUPPORT_EMAIL=support@example.com
+
+# ---- File storage ----------------------------------------------------
+# "local" (default, ./uploads) or "cloud" (Cloudflare R2)
+UPLOAD_STORAGE_PROVIDER=local
+# R2_ACCOUNT_ID=
+# R2_ACCESS_KEY_ID=
+# R2_SECRET_ACCESS_KEY=
+# R2_BUCKET_NAME=
+# R2_PUBLIC_URL=https://files.example.com
+# NEXT_PUBLIC_R2_PUBLIC_URL=https://files.example.com
+
+# ---- Maps (normally set in Settings -> Maps) -------------------------
+# "leaflet" (OpenStreetMap, free, no key — default), "google", "disabled"
+# MAPS_PROVIDER=leaflet
+# Browser key: Maps JavaScript API + Places API, restrict by HTTP referrer
+# NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=
+# Server key for db:backfill-coordinates: Geocoding API, restrict by IP
+# GOOGLE_GEOCODING_API_KEY=
+
+# ---- Stripe (fallback for the admin panel) ---------------------------
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 
-# Email (SMTP)
-EMAIL_SERVER_HOST=smtp.gmail.com
-EMAIL_SERVER_PORT=587
-EMAIL_SERVER_USER=your-email@gmail.com
-EMAIL_SERVER_PASSWORD=your-email-password
-EMAIL_FROM=your-email@gmail.com
+# ---- Email / SMTP (fallback for the admin panel) ---------------------
+# EMAIL_SERVER_HOST=smtp.gmail.com
+# EMAIL_SERVER_PORT=587
+# EMAIL_SERVER_USER=you@example.com
+# EMAIL_SERVER_PASSWORD=your-app-password
+# EMAIL_FROM=PropertyPro <noreply@example.com>
+ENABLE_EMAIL_NOTIFICATIONS=true
 
-# File Upload Configuration
-UPLOAD_MAX_SIZE=10485760
-UPLOAD_ALLOWED_TYPES=image/jpeg,image/png,image/webp,application/pdf
+# ---- Web Push (VAPID) ------------------------------------------------
+# npx web-push generate-vapid-keys
+# NEXT_PUBLIC_VAPID_PUBLIC_KEY=
+# VAPID_PRIVATE_KEY=
+# VAPID_SUBJECT=mailto:support@example.com
 
-# Application Configuration (optional)
-APP_NAME=propertypro
-APP_URL=http://localhost:3000
-SUPPORT_EMAIL=support@propertypro.com
-
-# Web Push (VAPID)
-NEXT_PUBLIC_VAPID_PUBLIC_KEY=your-vapid-public-key
-VAPID_PRIVATE_KEY=...
-VAPID_SUBJECT=mailto:admin@propertypro.app`,
+# ---- Encryption ------------------------------------------------------
+# Required before storing SSNs. 32+ chars, keep stable across deploys.
+# DATA_ENCRYPTION_KEY=`,
       },
     ],
     envTable: [
       {
         key: "MONGODB_URI",
         required: true,
-        description: "MongoDB Atlas or self-hosted MongoDB connection string for the PropertyPro database.",
+        description: "MongoDB Atlas or self-hosted connection string. In development it falls back to mongodb://localhost:27017/PropertyPro when omitted.",
       },
       {
         key: "MONGODB_DB",
         required: false,
-        description: "Database name override. Useful when your connection string does not include /propertypro.",
+        description: "Database name override, only used to build the localhost URI when MONGODB_URI is unset.",
       },
       {
-        key: "NEXTAUTH_SECRET",
+        key: "BETTER_AUTH_SECRET",
         required: true,
-        description: "Random secret used to sign auth sessions. Never commit this.",
+        description: "Signs sessions and tokens. Generate with openssl rand -base64 32. Falls back to AUTH_SECRET then NEXTAUTH_SECRET, so v2.x deployments keep working untouched.",
       },
       {
-        key: "NEXTAUTH_URL / AUTH_URL",
+        key: "BETTER_AUTH_URL",
         required: true,
-        description: "Public URL of your deployment, used in emails, callbacks, and auth redirects.",
+        description: "Public base URL with no trailing slash, used for callbacks and links in email. Falls back to NEXTAUTH_URL then NEXT_PUBLIC_APP_URL.",
       },
       {
-        key: "R2_ACCOUNT_ID",
-        required: true,
-        description: "Cloudflare account ID used to build the R2 S3 endpoint.",
+        key: "SETUP_SECRET",
+        required: false,
+        description: "Unlocks the one-time POST /api/setup/create-admin bootstrap. The endpoint is disabled while unset and refuses to run once any administrator exists. Remove it after creating your first admin.",
       },
       {
-        key: "R2_ACCESS_KEY_ID",
-        required: true,
-        description: "Access Key ID from a Cloudflare R2 API token with object read/write access.",
+        key: "UPLOAD_STORAGE_PROVIDER",
+        required: false,
+        description: "local (default, writes to ./uploads) or cloud (Cloudflare R2). Serverless hosts need cloud — their filesystem does not persist between requests.",
       },
       {
-        key: "R2_SECRET_ACCESS_KEY",
-        required: true,
-        description: "Secret Access Key for the same R2 API token. Store it once; Cloudflare does not show it again.",
+        key: "R2_*",
+        required: false,
+        description: "Account ID, access key, secret, bucket, and public URL. Required only when UPLOAD_STORAGE_PROVIDER=cloud.",
       },
       {
-        key: "R2_BUCKET_NAME",
-        required: true,
-        description: "Name of the bucket that stores uploaded property photos and documents.",
+        key: "MAPS_PROVIDER",
+        required: false,
+        description: "leaflet (OpenStreetMap, the default, needs no key), google, or disabled. Only a fallback — once a settings document exists, Settings → Maps wins.",
       },
       {
-        key: "R2_PUBLIC_URL / NEXT_PUBLIC_R2_PUBLIC_URL",
-        required: true,
-        description: "Public origin for reading uploaded files, either a production custom domain or a development r2.dev URL.",
+        key: "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY",
+        required: false,
+        description: "Browser key for the Google provider, with Maps JavaScript API and Places API enabled. It is served to the browser and cannot be kept secret, so restrict it by HTTP referrer and set a quota cap.",
       },
       {
-        key: "STRIPE_SECRET_KEY",
-        required: true,
-        description: "Server-side Stripe key. Use test keys in development.",
+        key: "GOOGLE_GEOCODING_API_KEY",
+        required: false,
+        description: "Separate server-side key with the Geocoding API enabled, used only by db:backfill-coordinates. Restrict it by IP — a referrer-restricted key is rejected.",
       },
       {
-        key: "STRIPE_WEBHOOK_SECRET",
-        required: true,
-        description: "Signing secret for the /api/webhooks/stripe endpoint.",
+        key: "STRIPE_SECRET_KEY / STRIPE_WEBHOOK_SECRET",
+        required: false,
+        description: "Fallback for the admin payment settings. The webhook secret belongs to the specific endpoint, not your account.",
       },
       {
         key: "EMAIL_SERVER_*",
-        required: true,
-        description: "Outbound email credentials for invites, receipts, and reminders.",
+        required: false,
+        description: "Outbound SMTP for invites, receipts, reminders, and the new inquiry and application emails. SMTP_* names are accepted as aliases. Fallback for the admin email settings.",
+      },
+      {
+        key: "NEXT_PUBLIC_DEMO_MODE",
+        required: false,
+        description: "Showcase deployments only. Renders the one-click demo login panel, and each row appears only if its NEXT_PUBLIC_DEMO_*_PASSWORD is also set. Never enable on a deployment holding real data.",
       },
       {
         key: "VAPID_*",
         required: false,
-        description: "Required only if you want web push notifications. Generate with npx web-push generate-vapid-keys.",
+        description: "Required only for web push notifications. Generate with npx web-push generate-vapid-keys.",
       },
       {
-        key: "UPLOAD_*",
+        key: "DATA_ENCRYPTION_KEY",
         required: false,
-        description: "Upload size and MIME type limits for images, WebP files, and PDFs.",
+        description: "Required before storing SSNs or other encrypted tenant identity data. At least 32 characters, and it must stay stable across deployments.",
       },
     ],
     callouts: [
       {
+        tone: "warn",
+        title: "Upgrading from v2.x? Keep your existing secret",
+        body: "BETTER_AUTH_SECRET falls back to AUTH_SECRET and then NEXTAUTH_SECRET, so no env change is required. If you do switch to the new names, copy the same value across — generating a new secret signs every user out.",
+      },
+      {
         tone: "tip",
-        title: "Generate NEXTAUTH_SECRET fast",
-        body: "Run openssl rand -base64 32 in your terminal and paste the output as the value.",
+        title: "Generate a secret fast",
+        body: "Run openssl rand -base64 32 for BETTER_AUTH_SECRET, and openssl rand -hex 32 for SETUP_SECRET.",
       },
     ],
   },
@@ -424,10 +564,18 @@ VAPID_SUBJECT=mailto:admin@propertypro.app`,
       },
       {
         title: "Seed demo data (optional)",
-        body: "Loads two demo properties, ten units, three tenants, and an admin account so you can explore immediately.",
+        body: "Loads demo properties, units, and tenants so the dashboard isn't empty. It creates no login — use the setup endpoint for that.",
         code: {
           lang: "bash",
           body: "pnpm db:seed",
+        },
+      },
+      {
+        title: "Run migrations when upgrading",
+        body: "Fresh installs need none of these. Upgrading from v2.x requires the Better Auth migration — the app returns 503 on every request until it has run. Preview any of them with --dry-run.",
+        code: {
+          lang: "bash",
+          body: "pnpm db:migrate-better-auth --dry-run   # preview, writes nothing\npnpm db:migrate-better-auth             # required, v2.x -> v3.0\npnpm db:migrate-email-index             # allows re-creating deleted tenants\npnpm db:backfill-coordinates            # puts pre-3.0 properties on the map",
         },
       },
       {
@@ -443,7 +591,12 @@ VAPID_SUBJECT=mailto:admin@propertypro.app`,
       {
         tone: "warn",
         title: "Production: skip the seed",
-        body: "Never run pnpm db:seed against a live database — it inserts demo records and accounts intended for evaluation.",
+        body: "Never run pnpm db:seed against a live database — it inserts demo records intended for evaluation. Migrations are safe to re-run; they skip anything already done.",
+      },
+      {
+        tone: "note",
+        title: "db:backfill-coordinates is a dry run by default",
+        body: "It lists what it would geocode, makes no API calls, and writes nothing. To apply, re-run with GEOCODE_APPLY=1 GEOCODE_CONFIRM=BACKFILL_COORDINATES and a GOOGLE_GEOCODING_API_KEY set — the script has no OpenStreetMap path, so it needs a Google key even on Leaflet installs.",
       },
     ],
   },
@@ -473,19 +626,24 @@ VAPID_SUBJECT=mailto:admin@propertypro.app`,
         },
       },
       {
-        title: "Sign in with the demo admin",
-        body: "If you ran the seed, an admin account exists out of the box.",
+        title: "Visit the public site and the dashboard",
+        body: "The site root is now the public marketing homepage, not a redirect to sign-in. The dashboard lives behind /auth/signin.",
         code: {
           lang: "txt",
-          body: "Email:    admin@propertypro.app\nPassword: admin1234",
+          body: "Public site:  http://localhost:3000\nProperties:   http://localhost:3000/properties\nDashboard:    http://localhost:3000/dashboard",
         },
       },
     ],
     callouts: [
       {
         tone: "note",
-        title: "Change the demo password",
-        body: "First action in production: log in, open Settings → Profile, and rotate the seeded password.",
+        title: "No account yet?",
+        body: "PropertyPro ships without any login. Create your first administrator with the SETUP_SECRET bootstrap covered in Quickstart and Admin & Roles.",
+      },
+      {
+        tone: "tip",
+        title: "Turn the public site off",
+        body: "If you only want the management dashboard, open Dashboard → Public Site and switch the master toggle off. The root URL then behaves as it did in v2.x — sign-in for guests, dashboard for signed-in users.",
       },
     ],
   },
@@ -882,28 +1040,50 @@ volumes:
     label: "Admin & Roles",
     title: "Set up your team",
     intro:
-      "After your first deploy, lock down the demo admin and create real users with scoped permissions.",
+      "PropertyPro ships with no accounts at all. Create the first administrator through the one-time bootstrap endpoint, then invite your team with scoped permissions.",
     icon: UserSettings01FreeIcons,
     accent: "indigo",
     steps: [
       {
-        title: "Sign in & rotate the demo password",
-        body: "Log in as admin@propertypro.app, open Settings → Profile, and set a strong password.",
+        title: "Create the first administrator",
+        body: "Add SETUP_SECRET to your environment and restart, then POST once to the bootstrap endpoint. It is disabled while the secret is unset and refuses to run once any administrator exists, so it cannot be replayed.",
+        code: {
+          lang: "bash",
+          body: 'openssl rand -hex 32   # use as SETUP_SECRET\n\ncurl -X POST https://your-domain.com/api/setup/create-admin \\\n  -H "Content-Type: application/json" \\\n  -H "x-setup-secret: $SETUP_SECRET" \\\n  -d \'{"email":"you@example.com","password":"<strong password>","firstName":"Your","lastName":"Name"}\'',
+        },
+      },
+      {
+        title: "Remove the setup secret",
+        body: "Delete SETUP_SECRET from your environment and redeploy. Its job is done.",
       },
       {
         title: "Invite your team",
-        body: "Settings → Team → Invite. Each invitee gets an email with a one-time setup link.",
+        body: "Settings → Team → Invite. Each invitee gets an email with a one-time setup link and chooses their own password — minimum 8 characters as of 3.0.",
       },
       {
         title: "Assign roles",
-        body: "Built-in roles: Admin, Manager, Accountant, Inspector, Tenant. Create custom roles under Settings → Roles.",
+        body: "Built-in roles are Admin, Manager, and Tenant. Manager and Tenant are now editable; Admin stays locked because it is the only guaranteed holder of role_management. Create custom roles under Settings → Roles.",
+      },
+      {
+        title: "Grant delete rights explicitly",
+        body: "New in 3.0: lease_delete, tenant_delete, payment_delete, document_delete, property_delete, and user_delete are separate permissions and are never implied by the matching edit grant. The built-in Manager ships without them, so managers cannot delete until you grant them. Bulk deletes also need bulk_operations.",
       },
       {
         title: "Audit log",
-        body: "Every sensitive action is recorded. Review under Settings → Activity.",
+        body: "Every sensitive action is recorded, including public-site edits. Review under Settings → Activity.",
       },
     ],
     callouts: [
+      {
+        tone: "warn",
+        title: "Never use seed:demo to create a real admin",
+        body: "That script exists to populate public showcase deployments at well-known email addresses. It refuses to run under NODE_ENV=production unless ALLOW_PRODUCTION_SEED is set, and it will not run at all without demo passwords in the environment.",
+      },
+      {
+        tone: "note",
+        title: "Reserved role names",
+        body: "Custom roles can no longer be named after a built-in role or its aliases (super_admin, landlord, owner, property_manager, and similar). Before 3.0 such a role was created but silently granted the full built-in permission set — check any custom roles created on an older version.",
+      },
       {
         tone: "warn",
         title: "Don't share admin accounts",
@@ -916,17 +1096,21 @@ volumes:
     label: "Updates & Backups",
     title: "Stay current and recoverable",
     intro:
-      "PropertyPro ships minor updates monthly. Every release is non-destructive — your data and customizations stay intact.",
+      "PropertyPro ships minor updates monthly. Your data survives every release. v3.0 is the one upgrade that needs a database migration — the bundled UPGRADE.md covers it in full, including rollback.",
     icon: RefreshFreeIcons,
     accent: "teal",
     steps: [
+      {
+        title: "Back up first",
+        body: "Settings → Backups → Create backup, or run mongodump. On the v3.0 upgrade this is the entire rollback plan.",
+      },
       {
         title: "Download the latest build",
         body: "From your CodeCanyon downloads. Compare the version against the Changelog to plan the update.",
       },
       {
         title: "Diff and merge",
-        body: "Use git or your favorite diff tool to merge the new files. Your /messages and /public assets are safe to keep as-is.",
+        body: "Use git or your favorite diff tool to merge the new files, preserving .env.local and your local ./uploads directory.",
       },
       {
         title: "Install and rebuild",
@@ -937,12 +1121,136 @@ volumes:
         },
       },
       {
+        title: "v2.x → v3.0 only: run the auth migration",
+        body: "v3.0 replaces NextAuth with Better Auth. Passwords, properties, leases, payments, and tenants are untouched, but every user is signed out once because the old JWT logins have no server-side record to convert. The migration is additive and safe to re-run.",
+        code: {
+          lang: "bash",
+          body: "pnpm db:migrate-better-auth --dry-run   # preview\npnpm db:migrate-better-auth",
+        },
+      },
+      {
+        title: "v2.x → v3.0 only: verify",
+        body: "Sign in with an existing account and its existing password, confirm Settings → Security lists your session, and check that terminating a session signs that device out.",
+      },
+      {
         title: "Schedule database backups",
         body: "Use MongoDB Atlas automated backups or set up nightly mongodump on a VPS.",
         code: {
           lang: "bash",
           body: "# Cron: nightly backup at 02:00\n0 2 * * * mongodump --uri=\"$MONGODB_URI\" --archive=/backups/propertypro-$(date +\\%F).archive --gzip",
         },
+      },
+    ],
+    callouts: [
+      {
+        tone: "warn",
+        title: "Customized files and the v3.0 upgrade",
+        body: "v3.0 changed 74 files mechanically. If you edited any of them, your copy is preserved and then out of step with the rest of the app. The usual fix is one import: next-auth/react becomes @/lib/auth-client, with useSession, signIn, and signOut keeping the same signatures. The old next-auth package is still installed so customized files don't break your build, but it is scheduled for removal in v3.1.",
+      },
+      {
+        tone: "note",
+        title: "Rolling back v3.0",
+        body: "The migration copies password hashes rather than moving them, so restoring the v2.3 files works as long as nobody has changed their password since upgrading. Anyone who has must reset, or you restore the backup.",
+      },
+    ],
+  },
+  {
+    id: "maps",
+    label: "Maps & Geocoding",
+    title: "Put your properties on the map",
+    intro:
+      "New in 3.0. Maps are a pluggable provider chosen in the app, not in a build step — the database setting wins over the environment, so switching provider needs no redeploy.",
+    icon: Location01FreeIcons,
+    accent: "emerald",
+    steps: [
+      {
+        title: "Pick a provider",
+        body: "Dashboard → Settings → Maps offers OpenStreetMap, Google Maps, or no maps. The same form is embedded in Public Site → Settings; both write the same setting.",
+      },
+      {
+        title: "OpenStreetMap — the default, no setup",
+        body: "Works on a fresh install with no API key, no Google Cloud account, and no credit card. Address search uses Nominatim, debounced and limited to queries of 3 characters or more to respect the OSM usage policy.",
+      },
+      {
+        title: "Google Maps — optional",
+        body: "Reveals an API key field. Enable Maps JavaScript API and Places API on the key, and restrict it by HTTP referrer. Google Maps requires a Cloud billing account.",
+        code: {
+          lang: "bash",
+          body: "# Fallback only — Settings -> Maps takes precedence\nMAPS_PROVIDER=google\nNEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your-browser-key",
+        },
+      },
+      {
+        title: "Geocode your existing properties",
+        body: "Properties created before 3.0 have no coordinates and stay off the maps until you backfill them. Dry run by default: it lists what it would do, makes no API calls, and writes nothing.",
+        code: {
+          lang: "bash",
+          body: "pnpm db:backfill-coordinates\n\n# Apply for real\nGEOCODE_APPLY=1 GEOCODE_CONFIRM=BACKFILL_COORDINATES \\\n  GOOGLE_GEOCODING_API_KEY=your-server-key \\\n  pnpm db:backfill-coordinates",
+        },
+      },
+    ],
+    callouts: [
+      {
+        tone: "warn",
+        title: "The browser key is public — restrict it",
+        body: "A Google Maps browser key is served to every visitor by design and cannot be kept secret. Restrict it by HTTP referrer to your own domains and set a daily quota cap in the Cloud console, or an unrestricted key can be lifted and billed against your account.",
+      },
+      {
+        tone: "note",
+        title: "The backfill needs a Google key either way",
+        body: "It geocodes through Google only — there is no Nominatim path — so it needs a separate server-side, IP-restricted key with the Geocoding API enabled, even on installs running the free OpenStreetMap provider. It skips properties that already have coordinates, so an interrupted run can simply be re-run.",
+      },
+      {
+        tone: "tip",
+        title: "Heavy traffic? Move off the public OSM servers",
+        body: "The Leaflet default points at OSM's shared tile and Nominatim infrastructure, which their usage policy says is unsuitable for production traffic. A busy install should switch to its own or a commercial tile and geocoding host.",
+      },
+    ],
+  },
+  {
+    id: "public-site",
+    label: "Public Site",
+    title: "Control the public marketing website",
+    intro:
+      "New in 3.0. PropertyPro serves a public home page, properties browser, property and unit detail pages, and a contact page from the same install — all of it switchable and editable from Dashboard → Public Site.",
+    icon: Globe02FreeIcons,
+    accent: "fuchsia",
+    steps: [
+      {
+        title: "Switch pages on or off",
+        body: "A master toggle plus per-page switches for Home, Properties, Property detail, and Contact. A page is live only when both its own switch and the master switch are on, and toggles save the moment you flip them.",
+      },
+      {
+        title: "Edit the copy",
+        body: "Five editors cover Brand & navigation, Home, Properties, Contact, and FAQ — wordmark, logo, header and footer links, hero headline and background, feature cards, how-it-works steps, FAQ categories, contact methods, and per-page SEO and social share metadata.",
+      },
+      {
+        title: "Accept rental applications",
+        body: "With Property detail on, visitors can apply for a unit through the checkout: lease terms, occupants, income, and screening consent, filed as a rental application. No payment is taken. Switch that page off and both checkout URLs redirect instead of accepting applications.",
+      },
+      {
+        title: "Grant access to the module",
+        body: "The new public_site_management permission controls it. Built-in Admin has it, and existing custom admin roles holding system_settings keep access without any change.",
+      },
+      {
+        title: "Reset to defaults",
+        body: "Public Site → Module settings restores any single section, or the whole public site, to the copy the app shipped with, behind a confirmation dialog.",
+      },
+    ],
+    callouts: [
+      {
+        tone: "note",
+        title: "Switching a page off never deletes anything",
+        body: "Signed-out visitors are redirected to /auth/signin and signed-in users to /dashboard — both targets editable, and both must be paths inside the app. Your stored copy comes back untouched when you switch the page on again.",
+      },
+      {
+        tone: "tip",
+        title: "Changes go live immediately",
+        body: "The public routes render per request rather than from a build-time prerender, and every save clears the public route cache, so shared header and footer edits land on every page at once.",
+      },
+      {
+        tone: "warn",
+        title: "Image fields are paths, not uploads",
+        body: "The hero background, feature card, and how-it-works images are path entry with a live preview. Put the file under /public first, then reference it — the editor warns when the path does not load.",
       },
     ],
   },
@@ -956,9 +1264,39 @@ volumes:
     accent: "amber",
     bullets: [
       {
+        icon: RefreshFreeIcons,
+        title: "Every request returns 503 \"database schema v0 but the application requires v1\"",
+        body: "The v3.0 auth migration has not run, or did not finish. Run pnpm db:migrate-better-auth. This message is deliberate — v3.0 refuses to serve an un-migrated database rather than answering correct passwords with \"invalid credentials\".",
+      },
+      {
+        icon: ShieldFreeIcons,
+        title: "\"Invalid email or password\" for a password you know is right",
+        body: "Same cause as the 503 — sign-in is not covered by the schema gate. Run pnpm db:migrate-better-auth. If the migration has run, check that BETTER_AUTH_SECRET still holds your old NEXTAUTH_SECRET value; changing it signs everyone out.",
+      },
+      {
+        icon: CodeFreeIcons,
+        title: "Build fails on next-auth/react",
+        body: "A file you customised still imports the old auth client. Change it to @/lib/auth-client — useSession, signIn, and signOut keep the same signatures and return shapes.",
+      },
+      {
+        icon: Location01FreeIcons,
+        title: "Properties don't appear on the map",
+        body: "Properties created before 3.0 have no coordinates. Run pnpm db:backfill-coordinates with GEOCODE_APPLY=1 and a GOOGLE_GEOCODING_API_KEY. New properties get coordinates from the address autocomplete on the property form.",
+      },
+      {
+        icon: UserSettings01FreeIcons,
+        title: "Managers can no longer delete leases or tenants",
+        body: "Expected in 3.0 — deleting now needs lease_delete, tenant_delete, payment_delete, document_delete, or user_delete, which no longer ride along with the edit grant. Edit the built-in Manager role or create a custom role to grant them.",
+      },
+      {
         icon: Database02FreeIcons,
         title: "MONGODB_URI connection refused",
         body: "Check the username, password, database name, and Atlas Network Access allowlist. For self-hosted MongoDB, confirm the authSource value.",
+      },
+      {
+        icon: Mail01FreeIcons,
+        title: "Inquiry and application emails never arrive",
+        body: "Everything email-shaped depends on SMTP under Settings → Email. Without it inquiries and applications are still stored and still badge the sidebar, but acknowledgements and staff alerts are not sent and dashboard replies are filed with an \"Email failed\" badge.",
       },
       {
         icon: CreditCardFreeIcons,
@@ -990,14 +1328,26 @@ volumes:
 ];
 
 const navGroups: { label: string; ids: string[] }[] = [
-  { label: "Get Started", ids: ["overview", "quickstart", "requirements"] },
+  {
+    label: "Get Started",
+    ids: ["overview", "upgrade-v3", "quickstart", "requirements"],
+  },
   {
     label: "Installation",
     ids: ["download", "env", "database", "running"],
   },
   {
     label: "Configuration",
-    ids: ["cloudflare-r2", "stripe", "email", "push", "branding", "languages"],
+    ids: [
+      "cloudflare-r2",
+      "stripe",
+      "email",
+      "push",
+      "maps",
+      "public-site",
+      "branding",
+      "languages",
+    ],
   },
   {
     label: "Deployment",

@@ -49,6 +49,9 @@ import {
   PencilEdit02FreeIcons,
   HomeFreeIcons,
   SparklesFreeIcons,
+  Globe02FreeIcons,
+  Mail01FreeIcons,
+  FileValidationFreeIcons,
 } from "@hugeicons/core-free-icons";
 import { Navbar } from "@/components/navbar";
 import { Button } from "@/components/ui/button";
@@ -94,11 +97,11 @@ const sections: Section[] = [
     steps: [
       {
         title: "Open the dashboard",
-        body: "Visit /dashboard from any browser or install PropertyPro as a PWA from the address bar for an app-like experience.",
+        body: "Visit /dashboard from any browser or install PropertyPro as a PWA from the address bar for an app-like experience. As of 3.0 the site root is your public website, not the sign-in page.",
       },
       {
         title: "Sign in with your credentials",
-        body: "Use the email and password provided by your workspace admin. Tenants receive their invite from the manager during onboarding.",
+        body: "Use the email and password provided by your workspace admin. Tenants receive their invite from the manager during onboarding, or sign up themselves through your public website. Passwords are a minimum of 8 characters.",
       },
       {
         title: "Complete your profile",
@@ -114,6 +117,16 @@ const sections: Section[] = [
         tone: "tip",
         title: "Pro tip",
         body: "Bookmark /dashboard or install the PWA — you'll get push notifications and offline access automatically.",
+      },
+      {
+        tone: "note",
+        title: "Applied through the website and can't sign in?",
+        body: "That's expected. A rental application has to be approved by staff before the account becomes active, and sign-in stays blocked while it's pending or after it's been rejected. The sign-in page says which of the two applies.",
+      },
+      {
+        tone: "warn",
+        title: "Signed out after an upgrade to 3.0?",
+        body: "Also expected, and it happens once. 3.0 rebuilt the sign-in system, so everyone logs back in — with the same password as before. Nobody needs to reset anything.",
       },
     ],
   },
@@ -149,6 +162,54 @@ const sections: Section[] = [
     ],
   },
   {
+    id: "public-site",
+    label: "Public Website",
+    title: "Your listings, live on the web",
+    intro:
+      "New in 3.0. PropertyPro now serves a public marketing website from the same install — a home page, a searchable properties browser, property and unit detail pages, and a contact page. Everything on it is switchable and editable from Dashboard → Public Site.",
+    icon: Globe02FreeIcons,
+    accent: "fuchsia",
+    steps: [
+      {
+        title: "Decide which pages are live",
+        body: "Public Site → Page switches. A master toggle turns the whole site on or off, and each page (Home, Properties, Property detail, Contact) has its own switch. A page is live only when both are on, and toggles save the moment you flip them.",
+      },
+      {
+        title: "Set your brand",
+        body: "Public Site → Brand & navigation. Wordmark, logo, tagline, header links, footer columns, legal links, social icons, and the copyright line — which accepts a {year} token that fills itself in.",
+      },
+      {
+        title: "Write the home page",
+        body: "Public Site → Home. Hero headline, sub-heading, background image, the search bar labels, how many featured listings to show (1–24), up to six feature cards, and up to six how-it-works steps.",
+      },
+      {
+        title: "Tune the properties and contact pages",
+        body: "Set the browser's heading and empty state, the property-detail units and nearby headings, the booking button label, and the contact page's methods, form copy, and confirmation message.",
+      },
+      {
+        title: "Add FAQs",
+        body: "Public Site → FAQ. Up to 12 categories of 20 question-and-answer pairs each, rendered as a filterable accordion on the home page.",
+      },
+    ],
+    callouts: [
+      {
+        tone: "tip",
+        title: "Changes go live immediately",
+        body: "The public pages render fresh on every request, and each save clears the cache — so a header or footer edit lands on every page at once. No rebuild, no redeploy.",
+      },
+      {
+        tone: "note",
+        title: "Switching a page off never deletes anything",
+        body: "Visitors are redirected to sign-in (or the dashboard, if they're signed in) and your copy comes back untouched when you switch it on again. Turn the master switch off entirely and the site root behaves as it did in 2.x.",
+      },
+      {
+        tone: "warn",
+        title: "Images are paths, not uploads",
+        body: "Hero, feature, and how-it-works images are entered as paths with a live preview. Put the file under /public first, then reference it — the editor warns you when a path doesn't load.",
+      },
+    ],
+  },
+  {
     id: "properties",
     label: "Properties & Units",
     title: "Build your portfolio",
@@ -162,16 +223,24 @@ const sections: Section[] = [
         body: "Go to Properties → New. Enter the address, type (residential / commercial / mixed), and a cover photo.",
       },
       {
+        title: "Find the address on the map",
+        body: "New in 3.0: start typing in the Search address box and pick a suggestion — street, city, state, ZIP, and country fill themselves in and the location is saved. A small map appears with a draggable pin so you can nudge the exact spot without editing any text.",
+      },
+      {
         title: "Create units inside the property",
         body: "Open the property and use the Units tab. Add rooms, square footage, rent, and status (vacant / occupied / under maintenance).",
       },
       {
         title: "Upload a unit gallery",
-        body: "Each unit supports multiple images — drag & drop into the gallery card to upload in bulk.",
+        body: "Each unit supports multiple images — drag & drop into the gallery card to upload in bulk. On the public site these open in a full-screen lightbox with arrow-key navigation.",
+      },
+      {
+        title: "Add a video tour",
+        body: "New in 3.0: the property form has a Video Tour field, and each unit can have its own. Paste a YouTube or Vimeo link, or a direct .mp4 / .webm / .mov file URL. Units without their own tour fall back to the building's.",
       },
       {
         title: "Define features & amenities",
-        body: "Tag amenities (parking, pool, balcony, AC) so they appear on listings and tenant-facing pages.",
+        body: "Tag amenities (parking, pool, balcony, AC) so they appear on listings and tenant-facing pages. Pet-friendly amenities also control whether applicants can add pets at checkout.",
       },
     ],
     callouts: [
@@ -179,6 +248,63 @@ const sections: Section[] = [
         tone: "note",
         title: "Status matters",
         body: "A unit must be marked Vacant before you can attach a new lease — PropertyPro prevents accidental double-bookings.",
+      },
+      {
+        tone: "tip",
+        title: "Properties added before 3.0 aren't on the map yet",
+        body: "They have no saved coordinates, so they show the fallback artwork instead of a real map. Ask your administrator to run the one-time coordinate backfill, or simply re-save each property using the address search.",
+      },
+    ],
+  },
+  {
+    id: "applications",
+    label: "Applications",
+    title: "Rent a unit online, end to end",
+    intro:
+      "New in 3.0. Prospective renters can apply for a unit straight from your public website — no phone call, no email thread, no one touching the dashboard. Applications land in Tenants → Applications for you to review.",
+    icon: FileValidationFreeIcons,
+    accent: "violet",
+    steps: [
+      {
+        title: "A visitor picks a unit",
+        body: "From a property or unit page they set a move-in date, lease term (6, 12, 18, or 24 months), and how many adults, children, and pets. The move-in cost updates live as they change it.",
+      },
+      {
+        title: "They see the real numbers before applying",
+        body: "The quote itemizes first month's rent — prorated if they're not moving in on the 1st — plus the security deposit and a pet deposit per animal. Due today reads $0: applying charges nothing.",
+      },
+      {
+        title: "They complete the four-step checkout",
+        body: "Contact details, requested lease terms, income and rental history, then screening consent. Applicants without an account get one created from the same form; signed-in visitors just confirm their details.",
+      },
+      {
+        title: "You're notified immediately",
+        body: "Every active admin and manager gets an in-app notification and an email with the full application. The applicant gets an acknowledgement carrying an APP- reference number they can quote.",
+      },
+      {
+        title: "Review it in the dashboard",
+        body: "Tenants → Applications. The detail page shows a Requested lease card (move-in, term, end date, occupants, pets) and a Quoted at submission card (rent, prorated first month, deposits, due at signing), plus a rent-to-income badge showing whether they meet the 3x guideline.",
+      },
+      {
+        title: "Approve to create the lease",
+        body: "Approving an application that came from the public checkout automatically drafts a lease with the requested dates and the quoted rent and deposit. You review and activate it as normal.",
+      },
+    ],
+    callouts: [
+      {
+        tone: "warn",
+        title: "Applicants can't sign in until you approve them",
+        body: "A pending or rejected application blocks sign-in by design. The confirmation screen and acknowledgement email both say so, so nobody is left guessing why their new password doesn't work.",
+      },
+      {
+        tone: "note",
+        title: "PropertyPro guards against the obvious mistakes",
+        body: "A second live application for the same home is refused, a unit let while the form was open reports that clearly, move-in dates are capped at 90 days out, and pets are blocked on listings whose amenities don't allow them.",
+      },
+      {
+        tone: "tip",
+        title: "Not taking applications yet?",
+        body: "Switch Property detail off under Public Site → Page switches. Visitors are redirected instead of reaching the checkout, and your listings stop advertising units you're not ready to lease.",
       },
     ],
   },
@@ -208,6 +334,18 @@ const sections: Section[] = [
         body: "Tenants log in to view their lease, pay rent, raise maintenance requests, and chat with management.",
       },
     ],
+    callouts: [
+      {
+        tone: "tip",
+        title: "Employment details are mostly optional now",
+        body: "Within the employment section only Employer is required — position, income, and start date can be left blank, which makes bulk imports and quick entry far less painful. The move-in date is no longer capped to a ±5-year window either.",
+      },
+      {
+        tone: "note",
+        title: "Re-leasing to a past tenant",
+        body: "A terminated tenant can be moved back into the pipeline (under review, approved, or inactive) instead of being a dead end. The status dropdown now only offers transitions that will actually be accepted.",
+      },
+    ],
   },
   {
     id: "leases",
@@ -232,7 +370,11 @@ const sections: Section[] = [
       },
       {
         title: "Renew or terminate",
-        body: "Use Renew to extend with new terms, or Terminate to close it cleanly with a final settlement.",
+        body: "Use Renew to extend with new terms, or Terminate to close it cleanly with a final settlement. As of 3.0 any lease that hasn't already ended can be terminated — active, expired, pending, or pending-signature — from one dialog available on the leases table, the card grid, and the detail page.",
+      },
+      {
+        title: "Edit at any point in the lease's life",
+        body: "New in 3.0: leases are no longer editable only as drafts. Property, unit, and tenant lock once the lease claims a unit, and rent and dates lock only once invoices have actually been issued — scheduled-but-unbilled invoices no longer freeze a lease. The edit screen tells you exactly what's locked and why.",
       },
     ],
     callouts: [
@@ -240,6 +382,16 @@ const sections: Section[] = [
         tone: "tip",
         title: "Reminders run for you",
         body: "PropertyPro emails tenants 30 days before lease expiry — no manual chasing required.",
+      },
+      {
+        tone: "note",
+        title: "Termination dates are flexible",
+        body: "Backdate a move-out that already happened, end an overrun lease past its printed end date, or schedule a future one. Future dates schedule the termination on active leases; every other status takes effect immediately.",
+      },
+      {
+        tone: "warn",
+        title: "Deleting a lease needs its own permission",
+        body: "Ended leases can now be deleted, taking their invoices, settled payments, deposit, and documents with them (soft-deleted and stamped, so an audit can still tell them apart). Live leases still refuse deletion — terminate first. Deleting requires the lease_delete permission, which managers don't get by default in 3.0.",
       },
     ],
   },
@@ -267,6 +419,23 @@ const sections: Section[] = [
       {
         title: "Close the loop",
         body: "Mark resolved, attach proof photos, and the tenant is notified automatically.",
+      },
+    ],
+    callouts: [
+      {
+        tone: "note",
+        title: "Status rules are consistent everywhere now",
+        body: "In 3.0 the detail page, the row menu, and bulk actions all follow the same rules. Completing a request requires it to be in progress — the detail page used to allow completing straight from Submitted with nobody assigned — and finishing a job from anywhere now releases the unit from maintenance status.",
+      },
+      {
+        tone: "tip",
+        title: "The list handles large portfolios",
+        body: "Search, filters, sorting, and pagination now run on the server rather than loading every request into your browser. Summary cards count the whole dataset, not just the rows on screen, and the Overdue card, filter, and per-row day count finally agree with each other.",
+      },
+      {
+        tone: "warn",
+        title: "Emergency escalation works again",
+        body: "Escalations previously failed with a server error, always reported level 1, and discarded their history. That's fixed — escalation now records its level and log properly, and is refused on completed or cancelled requests and once level 3 is reached.",
       },
     ],
   },
@@ -311,9 +480,9 @@ const sections: Section[] = [
   {
     id: "communications",
     label: "Communications",
-    title: "Chat, announcements & notifications",
+    title: "Chat, updates & website enquiries",
     intro:
-      "Stay in sync with tenants and your team — built-in chat, broadcasts, and a dedicated notifications inbox.",
+      "Stay in sync with tenants, your team, and the people browsing your website — built-in chat, broadcasts, a combined Updates feed, and an inbox for messages from your public contact form.",
     icon: MessageMultiple02FreeIcons,
     accent: "fuchsia",
     bullets: [
@@ -323,19 +492,41 @@ const sections: Section[] = [
         body: "1-on-1 and group threads, powered by Server-Sent Events for instant delivery.",
       },
       {
-        icon: Megaphone02FreeIcons,
-        title: "Announcements",
-        body: "Broadcast updates to all tenants of a property or building from the Announcements module.",
+        icon: Mail01FreeIcons,
+        title: "Inquiries inbox (new in 3.0)",
+        body: "Messages from the public contact form land in Inbox → Inquiries with an INQ- reference. Search, filter by status and topic, and reply without leaving the dashboard.",
       },
       {
         icon: Notification01FreeIcons,
-        title: "Notifications inbox",
-        body: "Every system event lands here. Mark read, filter, or jump to the source record in one click.",
+        title: "Updates: one feed (new in 3.0)",
+        body: "Announcements and Notifications are now a single Updates entry with a combined unread badge and a tab for each. Your old bookmarks still work — they redirect to the matching tab.",
+      },
+      {
+        icon: Megaphone02FreeIcons,
+        title: "Announcements",
+        body: "Broadcast to all tenants of a property or building — now the Announcements tab inside Updates.",
       },
       {
         icon: CustomerSupportFreeIcons,
         title: "Support tickets",
         body: "Open a ticket directly with the PropertyPro team for product-level help.",
+      },
+    ],
+    callouts: [
+      {
+        tone: "tip",
+        title: "Replies go out as real email",
+        body: "Answering an inquiry emails the prospect with their original message quoted underneath, and sets reply-to to your own address so their answer comes back to you personally. Every reply is kept on the record with its author and timestamp.",
+      },
+      {
+        tone: "note",
+        title: "The Inquiries badge is a to-do list, not an unread count",
+        body: "Opening an inquiry marks it read and moves it from New to In progress on its own, so the sidebar number means \"nobody has picked this up yet\". Replying to a closed inquiry reopens it as Replied; one marked Spam stays Spam.",
+      },
+      {
+        tone: "warn",
+        title: "Email needs SMTP configured",
+        body: "Without SMTP set up under Settings → Email, inquiries are still stored and still badge the sidebar, but acknowledgements and staff alerts never send, and a reply is filed with an \"Email failed\" badge instead of being lost.",
       },
     ],
   },
@@ -382,12 +573,22 @@ const sections: Section[] = [
       {
         icon: UserSettings01FreeIcons,
         title: "Team & roles",
-        body: "Invite admins, managers, accountants, and inspectors. Each role has scoped permissions.",
+        body: "Built-in roles are Admin, Manager, and Tenant. New in 3.0: Manager and Tenant are editable, so you can decide locally what a manager may do. Admin stays locked — it's the recovery role. Build anything else as a custom role.",
       },
       {
         icon: LockedFreeIcons,
-        title: "Granular permissions",
-        body: "Lock down sensitive modules (Finance, Settings) to specific roles only.",
+        title: "Delete rights are separate now",
+        body: "New in 3.0: deleting leases, tenants, payments, documents, properties, or users each needs its own permission, and none of them come along with the matching edit right. The built-in Manager ships without them — grant them deliberately.",
+      },
+      {
+        icon: Globe02FreeIcons,
+        title: "Public site access",
+        body: "The public_site_management permission controls who can edit your website. Admins have it, and existing custom admin roles that hold system settings keep access unchanged.",
+      },
+      {
+        icon: ShieldFreeIcons,
+        title: "Sign-in security",
+        body: "Passwords are now a minimum of 8 characters. Changing a password — or an admin resetting one — signs that account out everywhere else, and repeated failed sign-ins are rate limited.",
       },
       {
         icon: TranslateFreeIcons,
@@ -397,7 +598,19 @@ const sections: Section[] = [
       {
         icon: Moon02FreeIcons,
         title: "Dark mode",
-        body: "Toggle in the topbar. Respects your system preference by default.",
+        body: "Toggle in the topbar. Respects your system preference by default — including the operating system's reduce-motion setting, which 3.0 now honours across the app.",
+      },
+    ],
+    callouts: [
+      {
+        tone: "warn",
+        title: "Custom roles can't borrow a built-in name",
+        body: "Names like super_admin, landlord, owner, or property_manager are reserved. Before 3.0 a role named this way was created but silently granted the full built-in permission set while the screen showed only what you picked — worth re-checking any custom roles made on an older version.",
+      },
+      {
+        tone: "note",
+        title: "Managers lost delete rights on upgrade",
+        body: "This is intentional, not a bug. If your managers need to delete leases, tenants, or payments, edit the built-in Manager role and grant the specific delete permissions you want them to have.",
       },
     ],
   },
@@ -468,8 +681,16 @@ const navGroups: { label: string; ids: string[] }[] = [
   { label: "Get Started", ids: ["getting-started", "dashboard", "tips"] },
   {
     label: "Core Modules",
-    ids: ["properties", "tenants", "leases", "maintenance", "finance"],
+    ids: [
+      "properties",
+      "applications",
+      "tenants",
+      "leases",
+      "maintenance",
+      "finance",
+    ],
   },
+  { label: "Your Website", ids: ["public-site"] },
   { label: "Insights", ids: ["communications", "reports"] },
   { label: "Configuration", ids: ["settings", "mobile"] },
 ];

@@ -6,13 +6,14 @@ import UserManualClient from "./user-manual-client";
 export const metadata: Metadata = createPageMetadata({
   title: "User Manual",
   description:
-    "Learn how to use PropertyPro for daily property management workflows, including tenants, leases, rent payments, maintenance, reports, settings, PWA access, and productivity shortcuts.",
+    "Learn how to use PropertyPro for daily property management workflows, including your public website, online rental applications, tenants, leases, rent payments, maintenance, website enquiries, reports, settings, and PWA access.",
   path: "/user-manual",
   keywords: [
     "PropertyPro user manual",
     "tenant management guide",
     "lease management workflow",
     "property management user guide",
+    "online rental application guide",
   ],
 });
 
