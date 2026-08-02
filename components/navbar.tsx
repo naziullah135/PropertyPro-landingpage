@@ -272,7 +272,7 @@ export function Navbar() {
           </Link>
 
           <Link
-            href="https://propertypro-live.neurolightstudio.com/dashboard"
+            href="https://propertypro-live.neurolightstudio.com"
             target="_blank"
             rel="noopener noreferrer"
           >

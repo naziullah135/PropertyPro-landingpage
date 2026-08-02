@@ -219,9 +219,17 @@ export default function Home() {
                 href="https://propertypro-live.neurolightstudio.com/dashboard"
                 target="_blank"
                 rel="noopener noreferrer"
+                className="inline-flex h-12 items-center justify-center rounded-full border-2 border-dark  px-6 text-xl font-bold shadow-lg shadow-blue-500/30 hover:bg-blue-700"
+              >
+                Listing Demo
+              </a>
+               <a
+                href="https://propertypro-live.neurolightstudio.com/dashboard"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex h-12 items-center justify-center rounded-full bg-blue-600 px-6 text-xl font-bold text-white shadow-lg shadow-blue-500/30 hover:bg-blue-700"
               >
-                Try Live Demo
+                Admin Demo
               </a>
             </div>
           </div>
