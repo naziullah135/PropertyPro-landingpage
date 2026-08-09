@@ -216,10 +216,10 @@ export default function Home() {
             </h1>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <a
-                href="https://propertypro-live.neurolightstudio.com/dashboard"
+                href="https://propertypro-live.neurolightstudio.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex h-12 items-center justify-center rounded-full border-2 border-dark  px-6 text-xl font-bold shadow-lg shadow-blue-500/30 hover:bg-blue-700"
+                className="inline-flex h-12 items-center justify-center rounded-full border-2 border-dark  px-6 text-xl font-bold shadow-lg shadow-blue-500/30 hover:bg-gray-200"
               >
                 Listing Demo
               </a>
