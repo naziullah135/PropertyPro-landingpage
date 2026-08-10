@@ -75,7 +75,11 @@ type AccentKey =
 type CodeSnippet = { lang?: string; title?: string; body: string };
 type Step = { title: string; body: string; code?: CodeSnippet };
 type Bullet = { icon: IconSvgElement; title: string; body: string };
-type Callout = { tone: "tip" | "note" | "warn"; title: string; body: string };
+type Callout = {
+  tone: "tip" | "note" | "warn" | "critical";
+  title: string;
+  body: string;
+};
 type EnvRow = { key: string; required: boolean; description: string };
 
 type Section = {
@@ -85,6 +89,7 @@ type Section = {
   intro: string;
   icon: IconSvgElement;
   accent: AccentKey;
+  flag?: string;
   steps?: Step[];
   bullets?: Bullet[];
   callouts?: Callout[];
@@ -125,9 +130,9 @@ const sections: Section[] = [
     ],
     callouts: [
       {
-        tone: "warn",
-        title: "Upgrading from v2.x? Run the migration first",
-        body: "v3.0 replaces NextAuth with Better Auth and needs a one-time database migration — pnpm db:migrate-better-auth. Until it runs, every API call returns 503 and sign-in reports \"Invalid email or password\". See Upgrading to v3.0 before you do anything else.",
+        tone: "critical",
+        title: "Upgrading from v2.x? Nobody can log in until the migration runs",
+        body: "v3.0 replaces NextAuth with Better Auth and needs a one-time database migration — pnpm db:migrate-better-auth. Until it runs, every API call returns 503 and sign-in refuses even a correct admin password with \"Invalid email or password\". See Upgrading to v3.0 before you do anything else.",
       },
       {
         tone: "tip",
@@ -141,9 +146,10 @@ const sections: Section[] = [
     label: "Upgrading to v3.0",
     title: "v2.x → v3.0: run the auth migration",
     intro:
-      "Fresh install? Skip this section entirely. Upgrading from any 2.x version? v3.0 replaces NextAuth with Better Auth and needs a one-time database migration. The app refuses to serve requests until it has run.",
+      "Fresh install? Skip this section entirely. Upgrading from any 2.x version? v3.0 replaces NextAuth with Better Auth and needs a one-time database migration. Until it has run nobody can sign in — not even an administrator with the right password — and the app refuses to serve requests.",
     icon: RefreshFreeIcons,
     accent: "rose",
+    flag: "Required",
     codes: [
       {
         lang: "bash",
@@ -203,7 +209,7 @@ pnpm db:migrate-better-auth`,
     ],
     callouts: [
       {
-        tone: "warn",
+        tone: "critical",
         title: "Until the migration runs, every API call returns 503",
         body: "\"This deployment is running database schema v0 but the application requires v1.\" That is deliberate — v3.0 refuses to serve an un-migrated database rather than answering correct passwords with \"invalid credentials\". Sign-in is not covered by the gate, so it reports \"Invalid email or password\" instead; same cause, same fix.",
       },
@@ -1462,6 +1468,12 @@ const calloutStyles: Record<
     icon: Alert02FreeIcons,
     label: "text-amber-800",
   },
+  critical: {
+    wrap: "border-rose-300 bg-rose-50 ring-1 ring-rose-100",
+    iconWrap: "bg-rose-600 text-white",
+    icon: Alert02FreeIcons,
+    label: "text-rose-900",
+  },
 };
 
 const tabs = [
@@ -1589,29 +1601,32 @@ export default function DocsPage() {
     <main className="min-h-screen bg-white font-sans text-slate-900">
       {/* Announcement banner */}
       {bannerOpen && (
-        <div className="relative border-b border-slate-200 bg-slate-50 px-6 py-2.5 text-center text-xs">
-          <div className="mx-auto flex max-w-7xl items-center justify-center gap-2 pr-8 text-slate-600">
-            <HugeiconsIcon
-              icon={InformationCircleFreeIcons}
-              className="size-3.5 text-slate-400"
-            />
-            <span>
-              <span className="font-medium text-slate-900">v2.0.0</span> is out —
-              finance module, support tickets, push notifications.
+        <div className="relative border-b border-rose-200 bg-rose-50 px-6 py-2.5 text-center text-xs">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-2 gap-y-1 pr-8 text-rose-900">
+            <span className="inline-flex items-center gap-1.5 font-semibold">
+              <HugeiconsIcon icon={Alert02FreeIcons} className="size-3.5" />
+              v3.0 upgrade:
             </span>
-            <Link
-              href="/changelog"
-              className="inline-flex items-center gap-1 font-medium text-blue-600 hover:text-blue-700"
+            <span>
+              upgrading from v2.x? Nobody can sign in until you run{" "}
+              <code className="rounded bg-rose-100 px-1.5 py-0.5 font-mono text-[11px] font-medium text-rose-900">
+                pnpm db:migrate-better-auth
+              </code>
+              .
+            </span>
+            <a
+              href="#upgrade-v3"
+              className="inline-flex items-center gap-1 font-semibold text-rose-700 underline underline-offset-2 hover:text-rose-800"
             >
-              Read changelog
+              Read the migration guide
               <HugeiconsIcon icon={ArrowUpRight01FreeIcons} className="size-3" />
-            </Link>
+            </a>
           </div>
           <button
             type="button"
             onClick={() => setBannerOpen(false)}
             aria-label="Dismiss banner"
-            className="absolute top-1/2 right-4 -translate-y-1/2 rounded p-1 text-slate-400 transition-colors hover:bg-slate-200 hover:text-slate-700"
+            className="absolute top-1/2 right-4 -translate-y-1/2 rounded p-1 text-rose-400 transition-colors hover:bg-rose-100 hover:text-rose-700"
           >
             <HugeiconsIcon icon={Cancel01FreeIcons} className="size-3.5" />
           </button>
@@ -1633,7 +1648,7 @@ export default function DocsPage() {
               />
               <span className="text-slate-900">Documentation</span>
               <span className="ml-2 hidden rounded-full border border-slate-200 px-2 py-0.5 text-[10px] font-semibold text-slate-500 md:inline-block">
-                v2.0
+                v3.0
               </span>
             </div>
 
@@ -1724,6 +1739,11 @@ export default function DocsPage() {
                               <HugeiconsIcon icon={s.icon} className="size-3.5" />
                             </span>
                             <span className="truncate">{s.label}</span>
+                            {s.flag && (
+                              <span className="ml-auto shrink-0 rounded bg-rose-100 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-rose-700 uppercase">
+                                {s.flag}
+                              </span>
+                            )}
                           </a>
                         </li>
                       );
@@ -1772,6 +1792,55 @@ export default function DocsPage() {
             Everything you need to install, configure, and deploy PropertyPro —
             from your first <code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-sm text-slate-800">pnpm install</code> to a custom domain on production.
           </p>
+
+          {/* v3.0 migration alert */}
+          <div className="mt-8 rounded-2xl border border-rose-300 bg-rose-50 p-5 ring-1 ring-rose-100 md:p-6">
+            <div className="flex gap-4">
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-rose-600 text-white shadow-sm">
+                <HugeiconsIcon icon={Alert02FreeIcons} className="size-4" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <span className="inline-flex w-fit rounded bg-rose-600 px-2 py-0.5 text-[10px] font-semibold tracking-wider text-white uppercase">
+                  Action required
+                </span>
+                <h2 className="mt-2 text-base font-semibold text-rose-950 md:text-lg">
+                  Upgrading from v2.x? Run the Better Auth migration before
+                  anyone tries to log in
+                </h2>
+                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-700">
+                  v3.0 moves authentication from NextAuth to Better Auth, which
+                  needs a one-time database migration. Until it runs,{" "}
+                  <strong className="font-semibold text-rose-900">
+                    nobody can sign in
+                  </strong>{" "}
+                  — every API call returns 503 and the sign-in page rejects even
+                  a correct administrator password with &ldquo;Invalid email or
+                  password&rdquo;. Passwords carry over untouched and no records
+                  are rewritten; everyone is simply signed out once. Back up
+                  first, then run it. Fresh installs can ignore this.
+                </p>
+                <div className="mt-4">
+                  <CodeBlock
+                    snippet={{
+                      lang: "bash",
+                      title: "before starting v3.0",
+                      body: "pnpm db:migrate-better-auth --dry-run   # preview, writes nothing\npnpm db:migrate-better-auth             # required",
+                    }}
+                  />
+                </div>
+                <a
+                  href="#upgrade-v3"
+                  className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-rose-600 px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-rose-700"
+                >
+                  Read the full upgrade guide
+                  <HugeiconsIcon
+                    icon={ArrowRight02FreeIcons}
+                    className="size-3"
+                  />
+                </a>
+              </div>
+            </div>
+          </div>
 
           {/* Featured cards */}
           <div className="mt-10 grid gap-4 sm:grid-cols-2">

@@ -4,6 +4,8 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   PlayCircleFreeIcons,
   ArrowRight01FreeIcons,
+  ArrowRight02FreeIcons,
+  Alert02FreeIcons,
 } from "@hugeicons/core-free-icons";
 import { Navbar } from "@/components/navbar";
 import { Button } from "@/components/ui/button";
@@ -20,11 +22,21 @@ export const metadata: Metadata = createPageMetadata({
 
 type Section = "features" | "improvements" | "fixes";
 
+type Notice = {
+  badge: string;
+  title: string;
+  body: string;
+  command?: string;
+  href?: string;
+  linkLabel?: string;
+};
+
 type Release = {
   version: string;
   level: "major" | "minor";
   date: string;
   title: string;
+  notice?: Notice;
   sections: Partial<Record<Section, string[]>>;
 };
 
@@ -34,6 +46,15 @@ const releases: Release[] = [
     level: "major",
     date: "August 3, 2026",
     title: "Public Website, Online Applications & Auth Rebuild",
+    notice: {
+      badge: "Action required",
+      title: "Upgrading from 2.x? Run the Better Auth migration before anyone signs in",
+      body: "3.0 moves authentication from NextAuth to Better Auth, which needs a one-time database migration. Until it runs, nobody can log in — every API call returns 503 and sign-in refuses even a correct admin password with \"Invalid email or password\". Passwords carry over untouched and no data is rewritten; everyone is simply signed out once. Back up first, then run it. Fresh installs can ignore this.",
+      command:
+        "pnpm db:migrate-better-auth --dry-run   # preview, writes nothing\npnpm db:migrate-better-auth             # required before v3.0 boots",
+      href: "/docs#upgrade-v3",
+      linkLabel: "Read the v3.0 upgrade guide",
+    },
     sections: {
       features: [
         "Public marketing website served from the same install — home page with hero search, a properties browser, property and unit detail pages, and a contact page, replacing the bare root redirect that used to send every visitor to sign-in",
@@ -394,6 +415,49 @@ export default function ChangelogPage() {
                 <h3 className="mt-4 text-lg font-semibold text-slate-700">
                   {release.title}
                 </h3>
+
+                {release.notice && (
+                  <div className="mt-5 rounded-xl border border-rose-200 bg-rose-50/70 p-4 md:p-5">
+                    <div className="flex gap-3">
+                      <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-rose-100 text-rose-700">
+                        <HugeiconsIcon
+                          icon={Alert02FreeIcons}
+                          className="size-4"
+                        />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <span className="inline-flex w-fit rounded bg-rose-600 px-2 py-0.5 text-[10px] font-semibold tracking-wider text-white uppercase">
+                          {release.notice.badge}
+                        </span>
+                        <p className="mt-2 text-sm font-semibold text-rose-950">
+                          {release.notice.title}
+                        </p>
+                        <p className="mt-1.5 text-sm leading-relaxed text-slate-700">
+                          {release.notice.body}
+                        </p>
+                        {release.notice.command && (
+                          <pre className="mt-3 overflow-x-auto rounded-lg bg-slate-950 px-4 py-3 text-[13px] leading-relaxed">
+                            <code className="font-mono text-slate-100">
+                              {release.notice.command}
+                            </code>
+                          </pre>
+                        )}
+                        {release.notice.href && (
+                          <Link
+                            href={release.notice.href}
+                            className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-rose-700 hover:text-rose-800"
+                          >
+                            {release.notice.linkLabel ?? "Read more"}
+                            <HugeiconsIcon
+                              icon={ArrowRight02FreeIcons}
+                              className="size-3"
+                            />
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="mt-6 space-y-6">
                   {sectionOrder.map((s) => {
