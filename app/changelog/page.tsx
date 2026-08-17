@@ -42,6 +42,58 @@ type Release = {
 
 const releases: Release[] = [
   {
+    version: "3.1.0",
+    level: "minor",
+    date: "August 18, 2026",
+    title: "Multi-Provider Storage, Application-to-Lease Linking & Billing Repair",
+    notice: {
+      badge: "Action required",
+      title: "Still storing files on the local disk? Point PropertyPro at a bucket before uploading anything new",
+      body: "3.1 retires the local-disk storage backend. Nothing is switched behind your back and nothing is deleted — files an earlier install wrote to public/uploads stay listed, viewable, and deletable — but new uploads are refused with a message pointing at Settings → Storage until you choose Cloudflare R2, AWS S3, DigitalOcean Spaces, or MinIO and press Test Connection. No database migration is required this release. Installs already on R2 keep working as they are, and only need the optional command below to move their saved credentials into the new per-provider settings block.",
+      command:
+        "pnpm db:migrate-storage-providers --dry-run   # preview, writes nothing\npnpm db:migrate-storage-providers             # only if you already use R2",
+      href: "/docs#cloudflare-r2",
+      linkLabel: "Read the file storage setup guide",
+    },
+    sections: {
+      features: [
+        "Storage on any S3-compatible provider — AWS S3, DigitalOcean Spaces, and MinIO join Cloudflare R2 in Settings → Storage, each keeping its own saved credentials behind its own Test Connection, so switching backends and switching back never means re-typing keys",
+        "Setup instructions for every provider built into the settings page — where to create the bucket, which keys to copy, and how to make it publicly readable, written out for R2, S3, Spaces, and MinIO instead of left to the documentation",
+        "STORAGE_* environment variables for installs configured from .env rather than the UI — STORAGE_PROVIDER, STORAGE_BUCKET, STORAGE_ACCESS_KEY_ID, STORAGE_SECRET_ACCESS_KEY, and STORAGE_PUBLIC_URL, plus STORAGE_ACCOUNT_ID, STORAGE_REGION, and STORAGE_ENDPOINT, with the existing R2_* names still honored as a fallback so no .env has to be edited",
+        "A lease now records the application it was drafted from, so the application page shows the lease it produced and the lease shows the screening behind it — including leases staff build by hand from an approved application",
+        "Applicants are told what was decided — approval and decline emails go out on the decision and carry the reviewer's note when there is one",
+      ],
+      improvements: [
+        "Deleting a property now declines its open applications and emails those applicants first, instead of leaving people waiting on an answer for a home that no longer exists, and reports how many were closed",
+        "Deleting a property also retires its documents, maintenance requests, and inspections, which used to be left behind as rows pointing at a property nobody could open — all soft-deleted, so restoring the property brings them back",
+        "Location search on the public site is a real control instead of the browser's native suggestion list, which the browser drew in operating-system chrome that can't be styled and which never showed which location the visitor had committed to — it now matches on every term typed and ticks the current choice",
+        "Removing a unit that a draft lease still points at is now refused rather than silently breaking that lease, and the message counts the units blocked by live leases separately from the ones blocked by drafts, so it is clear which need terminating and which need deleting",
+        "A lease date clash now names the lease already covering those dates instead of reporting a generic overlap, and the create and edit paths answer that question the same way",
+        "Every settings page now loads a placeholder shaped like the page that's coming — backups, email, maps, notifications, payment, profile, properties, and storage each had a generic five-field card standing in, so every section mounted through two visible jumps before the real form appeared",
+        "Wider settings column, and a storage provider grid that lays out on the card's own width rather than the browser window, so all four providers stay on one line with the required fields grouped first",
+        "The site root and the public property browser now answer a bad URL with the marketing design instead of the bare framework page",
+        "Creating and editing a property go through one save path, so a rejected save reports the same message from either page, and the property form is now the single definition of what gets submitted",
+        "Lease notification emails localized across Arabic, German, English, Spanish, and French",
+      ],
+      fixes: [
+        "Fixed a pending lease keeping the invoices it had before it was edited — a lease activated ahead of its start date generates its whole schedule and then waits at pending, where editing it neither rebuilt the schedule nor refused the edit, so those leases went active still billing the old rent, the old dates, and the old tenant; run db:reconcile-invoice-drift to find and repair leases already affected, a dry run by default",
+        "Fixed opening the prefilled lease form twice from one approved application creating two leases against the same applicant and unit",
+        "Fixed the lease form and the application approval path disagreeing about whether a unit was free, so a unit could be taken according to one and available according to the other — draft leases now count on both",
+        "Fixed the property status tiles counting a stored status field while every other screen in the app works the status out from the units, letting the dashboard totals silently disagree with the list right below them",
+        "Fixed the ticket list, My Tickets, and ticket detail pages crashing on a ticket whose author's account had since been deleted",
+        "Fixed saving a property from the edit page dropping its map coordinates, year built, video tour link, and attachments",
+        "Fixed leaving Year built blank blocking property creation with a validation error pointing at nothing",
+        "Fixed a property-level Features list that was accepted by the form and then discarded on save — property features are amenities, and unit features are the switches on each unit",
+        "Fixed one unreadable property breaking the whole maintenance and ticket request forms instead of being skipped",
+        "Fixed every upload path writing to Cloudflare R2 regardless of the configured provider — property photos, branding assets, avatars, tenant documents, and lease documents each talked to R2 directly, and lease document uploads additionally ignored credentials saved in Settings → Storage until the server was restarted",
+        "Fixed a failing storage provider silently writing to the local disk instead, which hid broken credentials behind uploads that appeared to succeed and stranded files on a single server",
+        "Fixed images failing to display on S3, Spaces, and MinIO because the image optimizer's allowed hosts were fixed at build time from the R2 setting alone",
+        "Fixed backups on any provider other than R2 archiving the database and project files but none of the uploaded media",
+        "Fixed an uploaded SVG logo being re-encoded to PNG but saved under its original .svg name, so branding rendered as a broken image",
+      ],
+    },
+  },
+  {
     version: "3.0.0",
     level: "major",
     date: "August 3, 2026",
